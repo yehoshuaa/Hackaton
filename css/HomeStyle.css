@@ -1,0 +1,293 @@
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #222;
+        }
+
+        header {
+            border-bottom: 1px solid #dddddd00;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 20px 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #e66797;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: normal;
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            max-width: 50%;
+            height: 100vh;
+            background-color: #d97cab;
+            transition: left 0.3s ease;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side-menu.open {
+            left: 0;
+        }
+
+        .menu-top {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            height: 88px;
+            padding: 0 18px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+        }
+
+        .close-menu-btn {
+            background: none;
+            border: none;
+            font-size: 34px;
+            cursor: pointer;
+            color: #111;
+            line-height: 1;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-list li {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+        }
+
+        .menu-list a {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: #111;
+            font-size: 20px;
+            font-weight: 700;
+            padding: 18px 12px;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-list a:hover {
+            background-color: #f16682;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1050;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 18px;
+            border: 1px solid #aaa;
+            border-radius: 6px;
+        }
+
+        .tab-row {
+            display: flex;
+            width: 100%;
+            max-width: 360px;
+            background-color: #e98ab9;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            background-color: #e98ab9;
+            color: #333;
+        }
+
+        .tab-btn.active {
+            background-color: white;
+            font-weight: bold;
+        }
+
+        .building-select {
+            width: 100%;
+            max-width: 220px;
+            padding: 10px 12px;
+            font-size: 16px;
+            border: 1px solid #bbb;
+            border-radius: 6px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 1fr 80px;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .map-section {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .map-image {
+            width: 100%;
+            max-width: 700px;
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .floor-section {
+            border: 1px solid #dddddd00;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .floor-title {
+            font-size: 18px;
+            margin-bottom: 14px;
+        }
+
+        .floor-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .floor-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #e98ab9;
+            color: #222;
+        }
+
+        .floor-btn.active {
+            background-color: #ff2f2f;
+            color: white;
+        }
+
+        .rooster-content {
+            display: none;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .rooster-content.show {
+            display: block;
+        }
+
+        .map-content.hide {
+            display: none;
+        }
+
+        .corner-decoration {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            width: 280px;
+            height: 280px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .stripe {
+            position: absolute;
+            right: -300px;
+            bottom: 0;
+            width: 840px;
+            height: 300px;
+            transform: rotate(-52deg);
+            transform-origin: bottom right;
+        }
+
+        .stripe-1 {
+            background: #dce75a;
+            bottom: 180px;
+        }
+
+        .stripe-2 {
+            background: #b6d84a;
+            bottom: 80px;
+        }
+
+        .stripe-3 {
+            background: #43c78d;
+            bottom: 0;
+        }
+
+        @media (min-width: 768px) {
+            .content-layout {
+                grid-template-columns: 1fr 220px;
+            }
+
+            .floor-buttons {
+                flex-direction: column;
+            }
+        }
+    

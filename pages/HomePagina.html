@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Plattegrond</title>
+    <link rel="stylesheet" href="../css/HomeStyle.css">
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+
+    <nav class="side-menu" id="sideMenu">
+        <div class="menu-top">
+            <button class="close-menu-btn" id="closeMenuBtn" aria-label="Sluit menu">×</button>
+        </div>
+
+        <ul class="menu-list">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Plattegrond</a></li>
+            <li><a href="#">Rooster</a></li>
+            <li><a href="#">Profiel</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <div class="header-inner">
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button>
+            <h1 class="page-title">Home</h1>
+        </div>
+    </header>
+
+    <main>
+        <section class="controls">
+            <input type="text" class="search-box" placeholder="Zoeken...">
+
+            <div class="tab-row">
+                <button class="tab-btn active" id="mapTab">Map</button>
+                <button class="tab-btn" id="roosterTab">Rooster</button>
+            </div>
+
+            <select class="building-select" id="buildingSelect">
+                <option value="circus">Circus</option>
+                <option value="landrost">Landrost</option>
+                <option value="de-aardbei">De Aardbei</option>
+            </select>
+        </section>
+
+        <section class="map-content" id="mapContent">
+            <div class="content-layout">
+                <div class="map-section">
+                    <img
+                        id="mapImage"
+                        class="map-image"
+                        src="../images/placeholder1.png"
+                        alt="Plattegrond verdieping 1">
+                </div>
+
+                <aside class="floor-section">
+                    <div class="floor-buttons">
+                        <button class="floor-btn active" data-floor="1">1</button>
+                        <button class="floor-btn" data-floor="2">2</button>
+                        <button class="floor-btn" data-floor="3">3</button>
+                        <button class="floor-btn" data-floor="4">4</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="rooster-content" id="roosterContent">
+            <h2>Rooster</h2>
+            <p>Hier komt later de roosterinhoud.</p>
+        </section>
+
+        <div class="corner-decoration">
+            <div class="stripe stripe-1"></div>
+            <div class="stripe stripe-2"></div>
+            <div class="stripe stripe-3"></div>
+        </div>
+    </main>
+    <script src="../js/HomeScript.js"></script>
+</body>
+</html>
