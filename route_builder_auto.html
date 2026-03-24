@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Route Mapper - Auto Save</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #ef6d8f 0%, #e55d82 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .header p { font-size: 1.1rem; opacity: 0.9; }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 0;
+      min-height: 700px;
+    }
+
+    .sidebar {
+      background: #f8f9fa;
+      padding: 30px;
+      border-right: 2px solid #e0e0e0;
+      overflow-y: auto;
+    }
+
+    .form-group { margin-bottom: 25px; }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #ef6d8f;
+      box-shadow: 0 0 0 3px rgba(239, 109, 143, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: #ef6d8f;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #e55d82;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(239, 109, 143, 0.3);
+    }
+
+    .btn-secondary { background: #4f94d3; color: white; }
+    .btn-secondary:hover { background: #3d7dba; }
+    
+    .btn-success { background: #28a745; color: white; }
+    .btn-success:hover { background: #218838; }
+
+    .btn-light {
+      background: white;
+      border: 2px solid #ddd;
+      color: #333;
+    }
+
+    .btn-light:hover { background: #f8f9fa; }
+
+    .point-list {
+      list-style: none;
+      max-height: 200px;
+      overflow-y: auto;
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .point-list li {
+      padding: 8px;
+      background: #f0f0f0;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .point-list li .remove-point {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .point-list:empty::before {
+      content: 'No points added. Click on the map!';
+      color: #999;
+      font-size: 13px;
+      display: block;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .canvas-area {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+    }
+
+    .canvas-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .canvas-controls button {
+      padding: 10px 20px;
+      background: #4f94d3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .canvas-controls button:hover { background: #3d7dba; }
+
+    .canvas-wrapper {
+      flex: 1;
+      border: 3px solid #ddd;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: #f5f5f5;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      cursor: crosshair;
+      background: white;
+    }
+
+    .output-section {
+      padding: 30px;
+      background: #f8f9fa;
+      border-top: 2px solid #e0e0e0;
+    }
+
+    .output-section h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .output-section textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      resize: vertical;
+      margin-bottom: 15px;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .no-image-message {
+      text-align: center;
+      color: #999;
+      padding: 40px;
+    }
+
+    .no-image-message .icon {
+      font-size: 60px;
+      margin-bottom: 15px;
+    }
+
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 1200px) {
+      .main-content { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 2px solid #e0e0e0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🗺️ School Route Mapper</h1>
+      <p>Create and automatically save routes to your project</p>
+    </div>
+
+    <div class="main-content">
+      <div class="sidebar">
+        <div class="alert alert-info">
+          <strong>📌 Quick Start:</strong><br>
+          1. Load floor map image<br>
+          2. Fill room details<br>
+          3. Click map to add waypoints<br>
+          4. Save route<br>
+          5. Click "Auto-Update File" when done!
+        </div>
+
+        <div class="form-group">
+          <label>Building</label>
+          <select id="buildingSelect">
+            <option value="Circus">Circus</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Floor</label>
+          <select id="floorSelect">
+            <option value="AC1">AC1 (1st Floor)</option>
+            <option value="AC2">AC2 (2nd Floor)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Room Number</label>
+          <input type="text" id="roomNumber" placeholder="e.g., AC1.18" />
+        </div>
+
+        <div class="form-group">
+          <label>Route Type</label>
+          <select id="routeType">
+            <option value="main">Main Route (Black)</option>
+            <option value="accessible">Accessible Route (Green)</option>
+            <option value="quiet">Quiet/Alternative Route (Blue)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Waypoints (<span id="pointCount">0</span>)</label>
+          <ul id="pointList" class="point-list"></ul>
+          <button class="btn btn-light" onclick="clearCurrentRoute()">Clear Points</button>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveRoute()">💾 Save This Route</button>
+      </div>
+
+      <div class="canvas-area">
+        <div class="canvas-controls">
+          <button onclick="loadMapImage()">📁 Load Floor Map</button>
+          <button onclick="undoPoint()">↶ Undo</button>
+          <button onclick="toggleGrid()">⊞ Grid</button>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="mapCanvas"></canvas>
+          <div class="no-image-message" id="noImageMsg">
+            <div class="icon">📋</div>
+            <p><strong>No floor plan loaded</strong></p>
+            <p>Click "Load Floor Map" above</p>
+          </div>
+        </div>
+        <input type="file" id="imageInput" accept="image/*" style="display:none" />
+      </div>
+    </div>
+
+    <div class="output-section">
+      <h2>💾 Save to Project File</h2>
+      <div id="saveStatus"></div>
+      
+      <button class="btn btn-success" style="font-size: 18px; padding: 20px; margin-bottom: 20px;" onclick="autoUpdateFile()">
+        ✨ Auto-Update routescript.js
+      </button>
+
+      <hr style="border: none; border-top: 2px solid #ddd; margin: 30px 0;">
+
+      <h3>Preview Code</h3>
+      <textarea id="codeOutput" readonly placeholder="Routes will appear here..."></textarea>
+      
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="generateCode()">👁️ Preview</button>
+        <button class="btn btn-light" onclick="copyCode()">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let canvas, ctx;
+    let currentImage = null;
+    let currentPoints = [];
+    let allRoutes = {};
+    let showGrid = false;
+
+    window.onload = function() {
+      canvas = document.getElementById('mapCanvas');
+      ctx = canvas.getContext('2d');
+      canvas.width = 800;
+      canvas.height = 600;
+      canvas.addEventListener('click', handleCanvasClick);
+      updateUI();
+      loadSavedRoutes();
+    };
+
+    function loadSavedRoutes() {
+      const saved = localStorage.getItem('schoolRoutes');
+      if (saved) {
+        allRoutes = JSON.parse(saved);
+        showStatus('Loaded saved routes from browser storage', 'info');
+      }
+    }
+
+    function saveToBrowser() {
+      localStorage.setItem('schoolRoutes', JSON.stringify(allRoutes));
+    }
+
+    function handleCanvasClick(e) {
+      if (!currentImage) {
+        showStatus('Please load a floor plan first!', 'danger');
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.round((e.clientX - rect.left) * (canvas.width / rect.width));
+      const y = Math.round((e.clientY - rect.top) * (canvas.height / rect.height));
+
+      currentPoints.push([x, y]);
+      updateUI();
+      drawCanvas();
+    }
+
+    function loadMapImage() {
+      document.getElementById('imageInput').click();
+    }
+
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          currentImage = img;
+          canvas.width = img.width;
+          canvas.height = img.height;
+          document.getElementById('noImageMsg').style.display = 'none';
+          drawCanvas();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function drawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (currentImage) {
+        ctx.drawImage(currentImage, 0, 0);
+      }
+
+      if (showGrid && currentImage) {
+        drawGrid();
+      }
+
+      const floor = document.getElementById('floorSelect').value;
+      if (allRoutes[floor]) {
+        Object.keys(allRoutes[floor]).forEach(room => {
+          Object.keys(allRoutes[floor][room]).forEach(type => {
+            drawRoute(allRoutes[floor][room][type], getRouteColor(type), 0.3);
+          });
+        });
+      }
+
+      if (currentPoints.length > 0) {
+        const type = document.getElementById('routeType').value;
+        drawRoute(currentPoints, getRouteColor(type), 1);
+      }
+    }
+
+    function drawRoute(points, color, opacity) {
+      if (points.length === 0) return;
+
+      ctx.globalAlpha = opacity;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i][0], points[i][1]);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = color;
+      points.forEach((point, index) => {
+        ctx.beginPath();
+        ctx.arc(point[0], point[1], index === 0 ? 10 : 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+
+      if (points.length > 1) {
+        const last = points[points.length - 1];
+        const prev = points[points.length - 2];
+        const angle = Math.atan2(last[1] - prev[1], last[0] - prev[0]);
+        const size = 20;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(last[0], last[1]);
+        ctx.lineTo(last[0] - size * Math.cos(angle - Math.PI / 6), last[1] - size * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(last[0] - size * Math.cos(angle + Math.PI / 6), last[1] - size * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    function drawGrid() {
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.lineWidth = 1;
+      const step = 50;
+
+      for (let x = 0; x < canvas.width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y < canvas.height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+    }
+
+    function getRouteColor(type) {
+      return {main: '#111111', accessible: '#1eb06a', quiet: '#4f94d3'}[type] || '#111111';
+    }
+
+    function updateUI() {
+      const list = document.getElementById('pointList');
+      list.innerHTML = '';
+      
+      currentPoints.forEach((point, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>Point ${index + 1}: [${point[0]}, ${point[1]}]</span>
+          <button class="remove-point" onclick="removePoint(${index})">×</button>
+        `;
+        list.appendChild(li);
+      });
+
+      document.getElementById('pointCount').textContent = currentPoints.length;
+    }
+
+    function removePoint(index) {
+      currentPoints.splice(index, 1);
+      updateUI();
+      drawCanvas();
+    }
+
+    function undoPoint() {
+      if (currentPoints.length > 0) {
+        currentPoints.pop();
+        updateUI();
+        drawCanvas();
+      }
+    }
+
+    function clearCurrentRoute() {
+      if (currentPoints.length > 0 && confirm('Clear current points?')) {
+        currentPoints = [];
+        updateUI();
+        drawCanvas();
+      }
+    }
+
+    function toggleGrid() {
+      showGrid = !showGrid;
+      drawCanvas();
+    }
+
+    function saveRoute() {
+      const floor = document.getElementById('floorSelect').value;
+      const room = document.getElementById('roomNumber').value.trim();
+      const type = document.getElementById('routeType').value;
+
+      if (!room) {
+        showStatus('Please enter a room number!', 'danger');
+        return;
+      }
+
+      if (currentPoints.length < 2) {
+        showStatus('Please add at least 2 points!', 'danger');
+        return;
+      }
+
+      if (!allRoutes[floor]) allRoutes[floor] = {};
+      if (!allRoutes[floor][room]) allRoutes[floor][room] = {};
+      
+      allRoutes[floor][room][type] = [...currentPoints];
+      
+      saveToBrowser();
+      currentPoints = [];
+      updateUI();
+      drawCanvas();
+
+      showStatus(`✓ Route saved for ${room} (${type})`, 'success');
+    }
+
+    function generateCode() {
+      if (Object.keys(allRoutes).length === 0) {
+        showStatus('No routes saved yet!', 'danger');
+        return;
+      }
+
+      let code = '';
+      
+      Object.keys(allRoutes).forEach(floor => {
+        Object.keys(allRoutes[floor]).forEach(room => {
+          code += `        "${room}": {\n`;
+          Object.keys(allRoutes[floor][room]).forEach(type => {
+            const points = allRoutes[floor][room][type];
+            code += `          ${type}: [\n`;
+            points.forEach(point => {
+              code += `            [${point[0]}, ${point[1]}],\n`;
+            });
+            code += `          ],\n`;
+          });
+          code += `        },\n\n`;
+        });
+      });
+
+      document.getElementById('codeOutput').value = code;
+      showStatus('Code preview generated!', 'success');
+    }
+
+    function copyCode() {
+      const output = document.getElementById('codeOutput');
+      if (!output.value) {
+        showStatus('Generate code first!', 'danger');
+        return;
+      }
+
+      output.select();
+      document.execCommand('copy');
+      showStatus('✓ Code copied to clipboard!', 'success');
+    }
+
+    function autoUpdateFile() {
+      if (Object.keys(allRoutes).length === 0) {
+        showStatus('No routes to save! Create routes first.', 'danger');
+        return;
+      }
+
+      generateCode();
+      const code = document.getElementById('codeOutput').value;
+
+      // Create downloadable file
+      const blob = new Blob([code], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'routes_to_add.txt';
+      a.click();
+
+      showStatus('✓ Routes downloaded! Copy the content and paste it into routescript.js in the "routes" section.', 'success');
+    }
+
+    function showStatus(message, type) {
+      const statusDiv = document.getElementById('saveStatus');
+      statusDiv.className = `alert alert-${type}`;
+      statusDiv.innerHTML = `<strong>${message}</strong>`;
+      statusDiv.style.display = 'block';
+      
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
