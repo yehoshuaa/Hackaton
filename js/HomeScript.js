@@ -34,6 +34,12 @@ const closeModalBtn = document.getElementById("closeModalBtn");
 const cancelModalBtn = document.getElementById("cancelModalBtn");
 const header = document.querySelector("header");
 const main = document.querySelector("main");
+const buildingFloorImages = {
+    circus: {
+        1: "assets/circus-1.png",
+        2: "assets/circus-2.png"
+    }
+};
 
 hamburgerBtn.addEventListener("click", function () {
     sideMenu.classList.toggle("open");
@@ -45,18 +51,31 @@ overlay.addEventListener("click", function () {
     overlay.classList.remove("show");
 });
 
+function updateMapImage() {
+    const activeFloorButton = document.querySelector(".floor-btn.active");
+    const selectedBuilding = buildingSelect.value;
+    const selectedFloor = activeFloorButton ? activeFloorButton.dataset.floor : "1";
+    const buildingImages = buildingFloorImages[selectedBuilding] || {};
+    const imagePath = buildingImages[selectedFloor];
+
+    if (!imagePath) {
+        mapImage.removeAttribute("src");
+        mapImage.alt = `Geen plattegrond beschikbaar voor ${selectedBuilding} verdieping ${selectedFloor}`;
+        return;
+    }
+
+    mapImage.src = imagePath;
+    mapImage.alt = `Plattegrond ${selectedBuilding} verdieping ${selectedFloor}`;
+}
+
 floorButtons.forEach(function (button) {
     button.addEventListener("click", function () {
-        const floor = button.dataset.floor;
-
-        mapImage.src = `../images/placeholder${floor}.png`;
-        mapImage.alt = `Plattegrond verdieping ${floor}`;
-
         floorButtons.forEach(function (btn) {
             btn.classList.remove("active");
         });
 
         button.classList.add("active");
+        updateMapImage();
     });
 });
 
@@ -78,6 +97,7 @@ roosterTab.addEventListener("click", function () {
 
 buildingSelect.addEventListener("change", function () {
     console.log("Geselecteerd gebouw:", buildingSelect.value);
+    updateMapImage();
 });
 
 function openModal() {
@@ -412,3 +432,4 @@ modalOverlay.addEventListener("click", function (event) {
 });
 
 loadRooster();
+updateMapImage();
