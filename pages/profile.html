@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profiel</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/profile.css">
+</head>
+
+<body>
+
+    <main class="profile-screen">
+
+        <!-- Witte bovenkant -->
+        <div class="top-area">
+            <button class="back-btn">‹</button>
+            <h1>Profile</h1>
+        </div>
+
+        <!-- Inhoud -->
+        <div class="content-area">
+
+            <!-- Profiel -->
+            <div class="profile-card">
+                <img src="https://i.pravatar.cc/100?img=12" alt="Profielfoto" class="avatar">
+
+                <div class="profile-info">
+                    <h2>Peter de Vries</h2>
+                    <p>s1111111@student.windesheim.nl</p>
+                    <p>+31 6 1234 5678</p>
+                    <button class="link-btn" id="openPopupBtn">Wachtwoord veranderen</button>
+                </div>
+            </div>
+
+            <!-- Voorkeuren -->
+            <div class="settings-group">
+                <h3>Voorkeuren</h3>
+
+                <div class="row">
+                    <span>Meldingen</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="row row-link" id="locationRow">
+                    <span>Locatievoorkeur</span>
+                    <span id="selectedLocation">Circus ›</span>
+                </div>
+
+                <!-- Dropdown -->
+                <div class="dropdown" id="locationDropdown">
+                    <div class="dropdown-item">'t Circus</div>
+                    <div class="dropdown-item">De aardbei</div>
+                    <div class="dropdown-item">Landdrost</div>
+                </div>
+            </div>
+
+            <!-- Meldingen -->
+            <div class="settings-group">
+                <h3>Melding settings</h3>
+
+                <div class="row">
+                    <span>Les begint binnenkort</span>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="row">
+                    <span>Routes updates</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="row">
+                    <span>Drukte meldingen</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Toegankelijkheid -->
+            <div class="settings-group">
+                <h3>Toegankelijkheid</h3>
+
+                <div class="row">
+                    <span>Grote tekst</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="row">
+                    <span>Hoog contrast</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="row">
+                    <span>Rolstoelroute</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="row row-link">
+                    <span>Taal</span>
+                    <span>🌐 Kies ›</span>
+                </div>
+            </div>
+
+            <button class="logout">Uitloggen ›</button>
+
+        </div>
+
+    </main>
+
+    <!-- Popup -->
+    <div id="passwordPopup" class="popup">
+        <div class="popup-content">
+            <h2>Wachtwoord veranderen</h2>
+
+            <label>Nieuw wachtwoord</label>
+            <input type="password" id="newPassword">
+
+            <label>Herhaal nieuw wachtwoord</label>
+            <input type="password" id="repeatPassword">
+
+            <div class="popup-buttons">
+                <button id="saveBtn" class="save">Opslaan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/profile.js"></script>
+</body>
+
+</html>
