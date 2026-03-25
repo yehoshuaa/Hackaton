@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>School Route Mapper</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Route Mapper - Auto Save</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -34,20 +30,12 @@
       text-align: center;
     }
 
-    .header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
-    }
-
-    .header p {
-      font-size: 1.1rem;
-      opacity: 0.9;
-    }
+    .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .header p { font-size: 1.1rem; opacity: 0.9; }
 
     .main-content {
       display: grid;
       grid-template-columns: 400px 1fr;
-      gap: 0;
       min-height: 700px;
     }
 
@@ -58,9 +46,7 @@
       overflow-y: auto;
     }
 
-    .form-group {
-      margin-bottom: 25px;
-    }
+    .form-group { margin-bottom: 25px; }
 
     .form-group label {
       display: block;
@@ -110,19 +96,14 @@
       box-shadow: 0 5px 15px rgba(239, 109, 143, 0.3);
     }
 
-    .btn-secondary {
-      background: #4f94d3;
+    .btn-success {
+      background: #28a745;
       color: white;
+      font-size: 18px;
+      padding: 18px;
     }
 
-    .btn-secondary:hover {
-      background: #3d7dba;
-    }
-
-    .btn-danger {
-      background: #dc3545;
-      color: white;
-    }
+    .btn-success:hover { background: #218838; }
 
     .btn-light {
       background: white;
@@ -130,13 +111,11 @@
       color: #333;
     }
 
-    .btn-light:hover {
-      background: #f8f9fa;
-    }
+    .btn-light:hover { background: #f8f9fa; }
 
     .point-list {
       list-style: none;
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
       background: white;
       border: 2px solid #ddd;
@@ -155,6 +134,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 10px;
     }
 
     .point-list li .remove-point {
@@ -165,10 +145,11 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 11px;
+      flex-shrink: 0;
     }
 
     .point-list:empty::before {
-      content: 'No points added yet. Click on the map to add waypoints.';
+      content: 'No points added yet. Click on the map!';
       color: #999;
       font-size: 13px;
       display: block;
@@ -200,75 +181,24 @@
       font-weight: 600;
     }
 
-    .canvas-controls button:hover {
-      background: #3d7dba;
-    }
+    .canvas-controls button:hover { background: #3d7dba; }
 
     .canvas-wrapper {
-      flex: 1;
+      width: 100%;
+      height: 600px;
       border: 3px solid #ddd;
       border-radius: 12px;
       overflow: hidden;
       position: relative;
       background: #f5f5f5;
-      min-height: 500px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     canvas {
       display: block;
-      max-width: 100%;
-      max-height: 100%;
-      cursor: crosshair;
-      background: white;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 15px;
-    }
-
-    .status-main {
-      background: #111111;
-      color: white;
-    }
-
-    .status-accessible {
-      background: #1eb06a;
-      color: white;
-    }
-
-    .status-quiet {
-      background: #4f94d3;
-      color: white;
-    }
-
-    .output-section {
-      padding: 30px;
-      background: #f8f9fa;
-      border-top: 2px solid #e0e0e0;
-    }
-
-    .output-section h2 {
-      margin-bottom: 15px;
-      color: #333;
-    }
-
-    .output-section textarea {
       width: 100%;
-      min-height: 250px;
-      padding: 15px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      resize: vertical;
+      height: 100%;
+      cursor: crosshair;
+      background: #f5f5f5;
     }
 
     .alert {
@@ -284,28 +214,33 @@
       color: #0c5460;
     }
 
-    .alert-warning {
-      background: #fff3cd;
-      border: 1px solid #ffeaa7;
-      color: #856404;
+    .alert-success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
     }
 
-    .no-image-message {
+    .alert-danger {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .saved-badge {
+      background: #e7f3ff;
+      padding: 15px;
+      border-radius: 8px;
       text-align: center;
-      color: #999;
-      padding: 40px;
-    }
-
-    .no-image-message .icon {
-      font-size: 60px;
       margin-bottom: 15px;
     }
 
-    @media (max-width: 1200px) {
-      .main-content {
-        grid-template-columns: 1fr;
-      }
+    .saved-badge strong {
+      font-size: 1.5rem;
+      color: #ef6d8f;
+    }
 
+    @media (max-width: 1200px) {
+      .main-content { grid-template-columns: 1fr; }
       .sidebar {
         border-right: none;
         border-bottom: 2px solid #e0e0e0;
@@ -316,25 +251,19 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🗺️ School Route Mapper</h1>
-      <p>Create interactive routes for your classrooms</p>
+      <h1>🗺️ Route Mapper - Auto Save</h1>
+      <p>Maps auto-load • Click to add points • Saves directly to routescript.js!</p>
     </div>
 
     <div class="main-content">
       <div class="sidebar">
         <div class="alert alert-info">
-          <strong>How to use:</strong><br>
-          1. Click "Load Floor Map" to upload a floor plan<br>
-          2. Enter room details<br>
-          3. Click on the map to create route points<br>
-          4. Generate code when done
-        </div>
-
-        <div class="form-group">
-          <label>Building Name</label>
-          <select id="buildingSelect">
-            <option value="Circus">Circus</option>
-          </select>
+          <strong>📌 How to use:</strong><br />
+          1. Floor map loads automatically<br />
+          2. Enter room number<br />
+          3. Click on map to add waypoints<br />
+          4. Click "Save Route"<br />
+          5. Click "💾 Auto-Save to File" when done!
         </div>
 
         <div class="form-group">
@@ -360,336 +289,569 @@
         </div>
 
         <div class="form-group">
-          <label>Route Points (<span id="pointCount">0</span>)</label>
+          <label>Waypoints (<span id="pointCount">0</span>)</label>
           <ul id="pointList" class="point-list"></ul>
           <button class="btn btn-light" onclick="clearCurrentRoute()">Clear Points</button>
         </div>
 
-        <button class="btn btn-primary" onclick="saveRoute()">Save This Route</button>
-        <button class="btn btn-secondary" onclick="generateCode()">Generate Code</button>
+        <button class="btn btn-primary" onclick="saveRoute()">💾 Save This Route</button>
+
+        <div class="saved-badge">
+          <div>Saved Routes</div>
+          <strong id="savedCount">0</strong>
+        </div>
+
+      <button class="btn btn-success" onclick="generateCode()">
+        ✨ Generate Route Code
+      </button>
       </div>
 
       <div class="canvas-area">
         <div class="canvas-controls">
-          <button onclick="loadMapImage()">📁 Load Floor Map</button>
           <button onclick="undoPoint()">↶ Undo Last Point</button>
-          <button onclick="clearAllRoutes()">🗑️ Clear All Routes</button>
           <button onclick="toggleGrid()">⊞ Toggle Grid</button>
+          <button onclick="clearAllRoutes()">🗑️ Clear All Routes</button>
         </div>
 
-        <div class="canvas-wrapper" id="canvasWrapper">
+        <div class="canvas-wrapper">
           <canvas id="mapCanvas"></canvas>
-          <div class="no-image-message" id="noImageMsg">
-            <div class="icon">📋</div>
-            <p><strong>No floor plan loaded</strong></p>
-            <p>Click "Load Floor Map" to begin</p>
-          </div>
         </div>
-        <input type="file" id="imageInput" accept="image/*" style="display:none" />
       </div>
     </div>
 
-    <div class="output-section">
-      <h2>Generated JavaScript Code</h2>
-      <textarea id="codeOutput" readonly placeholder="Your route code will appear here after you save routes..."></textarea>
-      <button class="btn btn-primary" onclick="copyCode()">📋 Copy to Clipboard</button>
+    <div style="padding: 30px; background: #f8f9fa; border-top: 2px solid #e0e0e0;">
+      <div id="saveStatus"></div>
+      <h2 style="margin-bottom: 15px;">Generated Code Preview</h2>
+      <textarea
+        id="codeOutput"
+        readonly
+        style="width: 100%; min-height: 200px; padding: 15px; border: 2px solid #ddd; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px;"
+        placeholder="Routes will appear here..."
+      ></textarea>
+      <button class="btn btn-light" onclick="copyCode()">📋 Copy Code</button>
     </div>
   </div>
 
-  <script>
-    // State
-    let canvas, ctx;
-    let currentImage = null;
-    let currentPoints = [];
-    let allRoutes = {};
-    let showGrid = false;
+<script>
+  let canvas, ctx;
+  let currentImage = null;
+  let currentPoints = [];
+  let allRoutes = {};
+  let showGrid = false;
+  let routeScriptFileHandle = null;
 
-    // Initialize
-    window.onload = function() {
-      canvas = document.getElementById('mapCanvas');
-      ctx = canvas.getContext('2d');
-      
-      // Set initial canvas size
-      canvas.width = 800;
-      canvas.height = 600;
+  const floorMaps = {
+    AC1: { path: 'pages/assets/circus-1.png', width: 1182, height: 790 },
+    AC2: { path: 'pages/assets/circus-2.png', width: 1039, height: 808 }
+  };
 
-      // Canvas click handler
-      canvas.addEventListener('click', handleCanvasClick);
-
-      updateUI();
+  function getCanvasWrapperSize() {
+    const wrapper = canvas.parentElement;
+    return {
+      width: wrapper.clientWidth,
+      height: wrapper.clientHeight
     };
+  }
 
-    function handleCanvasClick(e) {
-      if (!currentImage) {
-        alert('Please load a floor plan image first!');
-        return;
-      }
+  function resizeCanvasToWrapper() {
+    const { width, height } = getCanvasWrapperSize();
+    canvas.width = width;
+    canvas.height = height;
+  }
 
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = Math.round((e.clientX - rect.left) * scaleX);
-      const y = Math.round((e.clientY - rect.top) * scaleY);
+  function getImageDrawData() {
+    if (!currentImage) return null;
 
-      currentPoints.push([x, y]);
-      updateUI();
-      drawCanvas();
+    const scale = Math.min(
+      canvas.width / currentImage.width,
+      canvas.height / currentImage.height
+    );
+
+    const drawWidth = currentImage.width * scale;
+    const drawHeight = currentImage.height * scale;
+    const offsetX = (canvas.width - drawWidth) / 2;
+    const offsetY = (canvas.height - drawHeight) / 2;
+
+    return { scale, drawWidth, drawHeight, offsetX, offsetY };
+  }
+
+  function showStatus(message, type) {
+    const statusDiv = document.getElementById('saveStatus');
+    statusDiv.className = `alert alert-${type}`;
+    statusDiv.innerHTML = `<strong>${message}</strong>`;
+    statusDiv.style.display = 'block';
+
+    if (type !== 'danger') {
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 5000);
     }
+  }
 
-    function loadMapImage() {
-      document.getElementById('imageInput').click();
+  function loadSavedRoutes() {
+    const saved = localStorage.getItem('schoolRoutes');
+    if (saved) {
+      allRoutes = JSON.parse(saved);
+      updateSavedCount();
+      showStatus('Loaded saved routes', 'info');
     }
+  }
 
-    document.getElementById('imageInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+  function saveToBrowser() {
+    localStorage.setItem('schoolRoutes', JSON.stringify(allRoutes));
+    updateSavedCount();
+  }
 
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
-          currentImage = img;
-          canvas.width = img.width;
-          canvas.height = img.height;
-          document.getElementById('noImageMsg').style.display = 'none';
-          drawCanvas();
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
+  function updateSavedCount() {
+    let count = 0;
+    Object.values(allRoutes).forEach(floor => {
+      Object.values(floor).forEach(room => {
+        count += Object.keys(room).length;
+      });
+    });
+    document.getElementById('savedCount').textContent = count;
+  }
+
+  function updateUI() {
+    const list = document.getElementById('pointList');
+    list.innerHTML = '';
+
+    currentPoints.forEach((point, index) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span>Point ${index + 1}: [${point[0]}, ${point[1]}]</span>
+        <button class="remove-point" onclick="removePoint(${index})">×</button>
+      `;
+      list.appendChild(li);
     });
 
-    function drawCanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById('pointCount').textContent = currentPoints.length;
+  }
 
-      // Draw image
-      if (currentImage) {
-        ctx.drawImage(currentImage, 0, 0);
-      }
+  function getRouteColor(type) {
+    return {
+      main: '#111111',
+      accessible: '#1eb06a',
+      quiet: '#4f94d3'
+    }[type] || '#111111';
+  }
 
-      // Draw grid if enabled
-      if (showGrid && currentImage) {
-        drawGridOverlay();
-      }
+  function drawGrid(offsetX, offsetY, drawWidth, drawHeight, scale) {
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.lineWidth = 1;
 
-      // Draw all saved routes (faded)
-      const floor = document.getElementById('floorSelect').value;
-      if (allRoutes[floor]) {
-        Object.keys(allRoutes[floor]).forEach(room => {
-          Object.keys(allRoutes[floor][room]).forEach(type => {
-            const points = allRoutes[floor][room][type];
-            drawRoute(points, getRouteColor(type), 0.3);
-          });
-        });
-      }
+    const step = 50 * scale;
 
-      // Draw current route (bold)
-      if (currentPoints.length > 0) {
-        const routeType = document.getElementById('routeType').value;
-        drawRoute(currentPoints, getRouteColor(routeType), 1);
-      }
-    }
-
-    function drawRoute(points, color, opacity) {
-      if (points.length === 0) return;
-
-      ctx.globalAlpha = opacity;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 8;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      // Draw path
+    for (let x = offsetX; x <= offsetX + drawWidth; x += step) {
       ctx.beginPath();
-      ctx.moveTo(points[0][0], points[0][1]);
-      for (let i = 1; i < points.length; i++) {
-        ctx.lineTo(points[i][0], points[i][1]);
-      }
+      ctx.moveTo(x, offsetY);
+      ctx.lineTo(x, offsetY + drawHeight);
       ctx.stroke();
+    }
 
-      // Draw points
+    for (let y = offsetY; y <= offsetY + drawHeight; y += step) {
+      ctx.beginPath();
+      ctx.moveTo(offsetX, y);
+      ctx.lineTo(offsetX + drawWidth, y);
+      ctx.stroke();
+    }
+  }
+
+  function drawRoute(points, color, opacity, scale, offsetX, offsetY) {
+    if (!points || points.length === 0) return;
+
+    ctx.save();
+    ctx.globalAlpha = opacity;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    ctx.beginPath();
+    ctx.moveTo(points[0][0] * scale + offsetX, points[0][1] * scale + offsetY);
+
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i][0] * scale + offsetX, points[i][1] * scale + offsetY);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    points.forEach((point, index) => {
+      const drawX = point[0] * scale + offsetX;
+      const drawY = point[1] * scale + offsetY;
+
+      ctx.beginPath();
+      ctx.arc(drawX, drawY, index === 0 ? 10 : 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    if (points.length > 1) {
+      const last = points[points.length - 1];
+      const prev = points[points.length - 2];
+
+      const lastX = last[0] * scale + offsetX;
+      const lastY = last[1] * scale + offsetY;
+      const prevX = prev[0] * scale + offsetX;
+      const prevY = prev[1] * scale + offsetY;
+
+      const angle = Math.atan2(lastY - prevY, lastX - prevX);
+      const size = 20;
+
       ctx.fillStyle = color;
-      points.forEach((point, index) => {
-        ctx.beginPath();
-        ctx.arc(point[0], point[1], index === 0 ? 10 : 6, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Add white border
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(
+        lastX - size * Math.cos(angle - Math.PI / 6),
+        lastY - size * Math.sin(angle - Math.PI / 6)
+      );
+      ctx.lineTo(
+        lastX - size * Math.cos(angle + Math.PI / 6),
+        lastY - size * Math.sin(angle + Math.PI / 6)
+      );
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!currentImage) return;
+
+    const drawData = getImageDrawData();
+    if (!drawData) return;
+
+    const { scale, drawWidth, drawHeight, offsetX, offsetY } = drawData;
+
+    ctx.drawImage(
+      currentImage,
+      0, 0, currentImage.width, currentImage.height,
+      offsetX, offsetY, drawWidth, drawHeight
+    );
+
+    if (showGrid) {
+      drawGrid(offsetX, offsetY, drawWidth, drawHeight, scale);
+    }
+
+    const floor = document.getElementById('floorSelect').value;
+
+    if (allRoutes[floor]) {
+      Object.keys(allRoutes[floor]).forEach(room => {
+        Object.keys(allRoutes[floor][room]).forEach(type => {
+          drawRoute(
+            allRoutes[floor][room][type],
+            getRouteColor(type),
+            0.3,
+            scale,
+            offsetX,
+            offsetY
+          );
+        });
       });
-
-      // Draw arrow at end
-      if (points.length > 1) {
-        const last = points[points.length - 1];
-        const prev = points[points.length - 2];
-        const angle = Math.atan2(last[1] - prev[1], last[0] - prev[0]);
-        const size = 20;
-
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.moveTo(last[0], last[1]);
-        ctx.lineTo(
-          last[0] - size * Math.cos(angle - Math.PI / 6),
-          last[1] - size * Math.sin(angle - Math.PI / 6)
-        );
-        ctx.lineTo(
-          last[0] - size * Math.cos(angle + Math.PI / 6),
-          last[1] - size * Math.sin(angle + Math.PI / 6)
-        );
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      ctx.globalAlpha = 1;
     }
 
-    function drawGridOverlay() {
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-      ctx.lineWidth = 1;
+    if (currentPoints.length > 0) {
+      const type = document.getElementById('routeType').value;
+      drawRoute(currentPoints, getRouteColor(type), 1, scale, offsetX, offsetY);
+    }
+  }
 
-      const step = 50;
-      for (let x = 0; x < canvas.width; x += step) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-      }
-
-      for (let y = 0; y < canvas.height; y += step) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-      }
+  function handleCanvasClick(e) {
+    if (!currentImage) {
+      showStatus('Floor map not loaded!', 'danger');
+      return;
     }
 
-    function getRouteColor(type) {
-      const colors = {
-        main: '#111111',
-        accessible: '#1eb06a',
-        quiet: '#4f94d3'
-      };
-      return colors[type] || colors.main;
+    const rect = canvas.getBoundingClientRect();
+    const drawData = getImageDrawData();
+    if (!drawData) return;
+
+    const { scale, drawWidth, drawHeight, offsetX, offsetY } = drawData;
+
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    if (
+      clickX < offsetX ||
+      clickX > offsetX + drawWidth ||
+      clickY < offsetY ||
+      clickY > offsetY + drawHeight
+    ) {
+      return;
     }
 
-    function updateUI() {
-      const list = document.getElementById('pointList');
-      list.innerHTML = '';
-      
-      currentPoints.forEach((point, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <span>Point ${index + 1}: [${point[0]}, ${point[1]}]</span>
-          <button class="remove-point" onclick="removePoint(${index})">×</button>
-        `;
-        list.appendChild(li);
-      });
+    const x = Math.round((clickX - offsetX) / scale);
+    const y = Math.round((clickY - offsetY) / scale);
 
-      document.getElementById('pointCount').textContent = currentPoints.length;
-    }
+    currentPoints.push([x, y]);
+    updateUI();
+    drawCanvas();
+  }
 
-    function removePoint(index) {
-      currentPoints.splice(index, 1);
+  function autoLoadFloorMap(floor) {
+    const mapData = floorMaps[floor];
+    const img = new Image();
+
+    img.onload = function() {
+      currentImage = img;
+      resizeCanvasToWrapper();
+      drawCanvas();
+      showStatus(`✓ ${floor} floor map loaded!`, 'success');
+    };
+
+    img.onerror = function() {
+      showStatus(`❌ Cannot find ${mapData.path}`, 'danger');
+    };
+
+    img.src = mapData.path;
+  }
+
+  function removePoint(index) {
+    currentPoints.splice(index, 1);
+    updateUI();
+    drawCanvas();
+  }
+
+  function undoPoint() {
+    if (currentPoints.length > 0) {
+      currentPoints.pop();
       updateUI();
       drawCanvas();
     }
+  }
 
-    function undoPoint() {
-      if (currentPoints.length > 0) {
-        currentPoints.pop();
-        updateUI();
-        drawCanvas();
-      }
-    }
-
-    function clearCurrentRoute() {
-      if (currentPoints.length > 0 && confirm('Clear all current points?')) {
-        currentPoints = [];
-        updateUI();
-        drawCanvas();
-      }
-    }
-
-    function toggleGrid() {
-      showGrid = !showGrid;
-      drawCanvas();
-    }
-
-    function saveRoute() {
-      const floor = document.getElementById('floorSelect').value;
-      const room = document.getElementById('roomNumber').value.trim();
-      const type = document.getElementById('routeType').value;
-
-      if (!room) {
-        alert('Please enter a room number!');
-        return;
-      }
-
-      if (currentPoints.length < 2) {
-        alert('Please add at least 2 points to create a route!');
-        return;
-      }
-
-      if (!allRoutes[floor]) allRoutes[floor] = {};
-      if (!allRoutes[floor][room]) allRoutes[floor][room] = {};
-      
-      allRoutes[floor][room][type] = [...currentPoints];
-      
+  function clearCurrentRoute() {
+    if (currentPoints.length > 0 && confirm('Clear current points?')) {
       currentPoints = [];
       updateUI();
       drawCanvas();
+    }
+  }
 
-      alert(`Route saved for ${room} (${type})!`);
+  function toggleGrid() {
+    showGrid = !showGrid;
+    drawCanvas();
+  }
+
+  function clearAllRoutes() {
+    if (confirm('Delete ALL saved routes?')) {
+      allRoutes = {};
+      localStorage.removeItem('schoolRoutes');
+      currentPoints = [];
+      updateSavedCount();
+      updateUI();
+      drawCanvas();
+    }
+  }
+async function saveRoute() {
+  const floor = document.getElementById('floorSelect').value;
+  const room = document.getElementById('roomNumber').value.trim();
+  const type = document.getElementById('routeType').value;
+
+  if (!room) {
+    showStatus('Enter room number!', 'danger');
+    return;
+  }
+
+  if (currentPoints.length < 2) {
+    showStatus('Add at least 2 points!', 'danger');
+    return;
+  }
+
+  if (!allRoutes[floor]) allRoutes[floor] = {};
+  if (!allRoutes[floor][room]) allRoutes[floor][room] = {};
+
+  allRoutes[floor][room][type] = [...currentPoints];
+  saveToBrowser();
+
+  try {
+    const response = await fetch('http://localhost:3000/save-route', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ allRoutes })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Unknown server error');
     }
 
-    function clearAllRoutes() {
-      if (confirm('This will delete all saved routes. Continue?')) {
-        allRoutes = {};
-        currentPoints = [];
-        updateUI();
-        drawCanvas();
-      }
+    currentPoints = [];
+    updateUI();
+    drawCanvas();
+    generateCode();
+
+    showStatus(`✓ Route saved for ${room} (${type}) and written to routescript.js`, 'success');
+  } catch (error) {
+    console.error(error);
+    showStatus(`Could not save to routescript.js: ${error.message}`, 'danger');
+  }
+}
+
+  function generateCode() {
+    const floor = document.getElementById('floorSelect').value;
+
+    if (!allRoutes[floor] || Object.keys(allRoutes[floor]).length === 0) {
+      showStatus(`No saved routes for ${floor}!`, 'danger');
+      document.getElementById('codeOutput').value = '';
+      return;
     }
 
-    function generateCode() {
-      if (Object.keys(allRoutes).length === 0) {
-        alert('No routes saved yet! Please create and save routes first.');
-        return;
-      }
+    let code = '';
 
-      let code = '// Copy this into your routescript.js buildingData.routes\n\n';
-      
-      Object.keys(allRoutes).forEach(floor => {
-        Object.keys(allRoutes[floor]).forEach(room => {
-          code += `"${room}": {\n`;
-          Object.keys(allRoutes[floor][room]).forEach(type => {
-            const points = allRoutes[floor][room][type];
-            code += `  ${type}: [\n`;
-            points.forEach(point => {
-              code += `    [${point[0]}, ${point[1]}],\n`;
-            });
-            code += `  ],\n`;
-          });
-          code += `},\n\n`;
+    Object.keys(allRoutes[floor]).sort().forEach(room => {
+      code += `  "${room}": {\n`;
+
+      const routeTypes = allRoutes[floor][room];
+      const orderedTypes = ['main', 'accessible', 'quiet'];
+
+      orderedTypes.forEach(type => {
+        if (!routeTypes[type]) return;
+
+        const points = routeTypes[type];
+        code += `    ${type}: [`;
+        points.forEach((point, index) => {
+          code += `${index === 0 ? '' : ', '}[${point[0]}, ${point[1]}]`;
         });
+        code += `],\n`;
       });
 
-      document.getElementById('codeOutput').value = code;
+      code += `  },\n`;
+    });
+
+    document.getElementById('codeOutput').value = code;
+    showStatus(`✓ ${floor} route code generated. Paste it into buildingData.Circus.${floor}.routes`, 'success');
+  }
+
+  function copyCode() {
+    const output = document.getElementById('codeOutput');
+    if (!output.value) {
+      generateCode();
+      if (!output.value) return;
     }
 
-    function copyCode() {
-      const output = document.getElementById('codeOutput');
-      if (!output.value) {
-        alert('No code to copy! Generate code first.');
-        return;
-      }
+    output.select();
+    document.execCommand('copy');
+    showStatus('✓ Code copied to clipboard!', 'success');
+  }
+async function pickRouteScriptFile() {
+  try {
+    [routeScriptFileHandle] = await window.showOpenFilePicker({
+      types: [
+        {
+          description: 'JavaScript Files',
+          accept: {
+            'text/javascript': ['.js']
+          }
+        }
+      ],
+      multiple: false
+    });
 
-      output.select();
-      document.execCommand('copy');
-      alert('Code copied to clipboard! ✓');
+    showStatus('✓ routescript.js selected', 'success');
+  } catch (error) {
+    if (error.name !== 'AbortError') {
+      showStatus('Could not open routescript.js', 'danger');
+      console.error(error);
     }
-  </script>
+  }
+}
+
+function buildFloorRouteCode(floor) {
+  if (!allRoutes[floor] || Object.keys(allRoutes[floor]).length === 0) {
+    return '';
+  }
+
+  let code = '';
+
+  Object.keys(allRoutes[floor]).sort().forEach(room => {
+    code += `        "${room}": {\n`;
+
+    const routeTypes = allRoutes[floor][room];
+    const orderedTypes = ['main', 'accessible', 'quiet'];
+
+    orderedTypes.forEach(type => {
+      if (!routeTypes[type]) return;
+
+      const points = routeTypes[type];
+      code += `          ${type}: [`;
+      points.forEach((point, index) => {
+        code += `${index === 0 ? '' : ', '}[${point[0]}, ${point[1]}]`;
+      });
+      code += `],\n`;
+    });
+
+    code += `        },\n`;
+  });
+
+  return code;
+}
+
+async function writeRoutesToFile() {
+  if (!routeScriptFileHandle) {
+    showStatus('Open routescript.js first', 'danger');
+    return false;
+  }
+
+  try {
+    const file = await routeScriptFileHandle.getFile();
+    let content = await file.text();
+
+    ['AC1', 'AC2'].forEach(floor => {
+      const routeCode = buildFloorRouteCode(floor);
+
+      const floorRegex = new RegExp(
+        `(${floor}\\s*:\\s*\\{[\\s\\S]*?routes\\s*:\\s*\\{)([\\s\\S]*?)(\\n\\s*\\}\\s*\\n\\s*\\})`,
+        'm'
+      );
+
+      content = content.replace(floorRegex, (match, start, oldRoutes, end) => {
+        const newRoutesBlock = routeCode ? `\n${routeCode}      ` : '\n      ';
+        return `${start}${newRoutesBlock}${end}`;
+      });
+    });
+
+    const writable = await routeScriptFileHandle.createWritable();
+    await writable.write(content);
+    await writable.close();
+
+    return true;
+  } catch (error) {
+    showStatus('Failed to update routescript.js', 'danger');
+    console.error(error);
+    return false;
+  }
+}
+  window.onload = function() {
+    canvas = document.getElementById('mapCanvas');
+    ctx = canvas.getContext('2d');
+
+    canvas.addEventListener('click', handleCanvasClick);
+
+    document.getElementById('floorSelect').addEventListener('change', function() {
+      currentPoints = [];
+      updateUI();
+      autoLoadFloorMap(this.value);
+    });
+
+    loadSavedRoutes();
+    updateUI();
+    updateSavedCount();
+    autoLoadFloorMap('AC1');
+  };
+
+  window.addEventListener('resize', () => {
+    if (!canvas) return;
+    resizeCanvasToWrapper();
+    drawCanvas();
+  });
+</script>
 </body>
 </html>

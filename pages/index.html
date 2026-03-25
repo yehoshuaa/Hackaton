@@ -1,12 +1,243 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Login</title>
-    </head>
-    <body>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Navigatie - Kies je lokaal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-        
-    </body>
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      color: #ef6d8f;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1.1rem;
+    }
+
+    .floor-section {
+      margin-bottom: 50px;
+    }
+
+    .floor-title {
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 4px solid #ef6d8f;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .floor-badge {
+      background: #ef6d8f;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .room-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .room-card {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 20px 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      min-height: 100px;
+    }
+
+    .room-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    }
+
+    .room-card .room-number {
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+
+    .search-box {
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 1.1rem;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #ef6d8f;
+      box-shadow: 0 0 0 3px rgba(239, 109, 143, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .room-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .floor-title {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🗺️ Campus Navigatie Companion</h1>
+      <p class="subtitle">Kies je lokaal om de route te bekijken</p>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 Zoek een lokaal (bijv. AC1.18)..." onkeyup="filterRooms()">
+    </div>
+
+    <div id="roomsContainer">
+      <!-- AC1 Section -->
+      <div class="floor-section">
+        <h2 class="floor-title">
+          <span class="floor-badge">AC1</span>
+          1e Verdieping
+        </h2>
+        <div class="room-grid" id="ac1-rooms"></div>
+      </div>
+
+      <!-- AC2 Section -->
+      <div class="floor-section">
+        <h2 class="floor-title">
+          <span class="floor-badge">AC2</span>
+          2e Verdieping
+        </h2>
+        <div class="room-grid" id="ac2-rooms"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ALL ROOMS FROM YOUR SCREENSHOTS
+    const rooms = {
+      AC1: [
+        "AC1.01", "AC1.02", "AC1.03", "AC1.04", "AC1.05", "AC1.06", "AC1.07", "AC1.08", 
+        "AC1.09", "AC1.10", "AC1.11", "AC1.12", "AC1.13", "AC1.14", "AC1.15", "AC1.16",
+        "AC1.17", "AC1.18", "AC1.19", "AC1.20", "AC1.21", "AC1.22", "AC1.23", "AC1.24",
+        "AC1.25", "AC1.26", "AC1.27", "AC1.28", "AC1.29", "AC1.30", "AC1.31", "AC1.32",
+        "AC1.33", "AC1.34", "AC1.35", "AC1.36", "AC1.37", "AC1.38", "AC1.39", "AC1.40",
+        "AC1.41", "AC1.42", "AC1.43", "AC1.44", "AC1.45", "AC1.46", "AC1.47", "AC1.48",
+        "AC1.49", "AC1.50", "AC1.51", "AC1.52", "AC1.53", "AC1.54", "AC1.55", "AC1.56",
+        "AC1.57", "AC1.58", "AC1.59", "AC1.60", "AC1.61", "AC1.62", "AC1.63", "AC1.64",
+        "AC1.65", "AC1.66", "AC1.67", "AC1.68", "AC1.69", "AC1.70", "AC1.71", "AC1.72",
+        "AC1.73", "AC1.74", "AC1.75", "AC1.76", "AC1.77", "AC1.78", "AC1.79", "AC1.80",
+        "AC1.81", "AC1.82", "AC1.83", "AC1.84", "AC1.85", "AC1.86", "AC1.87", "AC1.88",
+        "AC1.89", "AC1.90", "AC1.91", "AC1.92", "AC1.93", "AC1.94", "AC1.95", "AC1.96",
+        "AC1.97", "AC1.98", "AC1.99"
+      ],
+      AC2: [
+        "AC2.01", "AC2.02", "AC2.03", "AC2.04", "AC2.05", "AC2.06", "AC2.07", "AC2.08",
+        "AC2.09", "AC2.10", "AC2.11", "AC2.12", "AC2.13", "AC2.14", "AC2.15", "AC2.16",
+        "AC2.17", "AC2.18", "AC2.19", "AC2.20", "AC2.21", "AC2.22", "AC2.23", "AC2.24",
+        "AC2.25", "AC2.26", "AC2.27", "AC2.28", "AC2.29", "AC2.30", "AC2.31", "AC2.32",
+        "AC2.33", "AC2.34", "AC2.35", "AC2.36", "AC2.37", "AC2.38", "AC2.39", "AC2.40",
+        "AC2.41", "AC2.42", "AC2.43", "AC2.44", "AC2.45", "AC2.46", "AC2.47", "AC2.48",
+        "AC2.49", "AC2.50", "AC2.51", "AC2.52", "AC2.53", "AC2.54", "AC2.55", "AC2.56",
+        "AC2.57", "AC2.58", "AC2.59", "AC2.60", "AC2.61", "AC2.62", "AC2.63", "AC2.64",
+        "AC2.65", "AC2.66", "AC2.67", "AC2.68", "AC2.69", "AC2.70", "AC2.71", "AC2.72",
+        "AC2.73", "AC2.74", "AC2.75", "AC2.76", "AC2.77", "AC2.78", "AC2.79", "AC2.80",
+        "AC2.81", "AC2.82", "AC2.83", "AC2.84", "AC2.85", "AC2.86", "AC2.87", "AC2.88",
+        "AC2.89", "AC2.90", "AC2.91", "AC2.92", "AC2.93", "AC2.94", "AC2.95", "AC2.96",
+        "AC2.97", "AC2.98", "AC2.99"
+      ]
+    };
+
+    // Generate room cards
+    function generateRoomCards() {
+      const ac1Container = document.getElementById('ac1-rooms');
+      const ac2Container = document.getElementById('ac2-rooms');
+
+      rooms.AC1.forEach(room => {
+        const card = document.createElement('a');
+        card.href = `Route.html?room=${room}`;
+        card.className = 'room-card';
+        card.innerHTML = `<div class="room-number">${room}</div>`;
+        ac1Container.appendChild(card);
+      });
+
+      rooms.AC2.forEach(room => {
+        const card = document.createElement('a');
+        card.href = `Route.html?room=${room}`;
+        card.className = 'room-card';
+        card.innerHTML = `<div class="room-number">${room}</div>`;
+        ac2Container.appendChild(card);
+      });
+    }
+
+    // Filter rooms based on search
+    function filterRooms() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const allCards = document.querySelectorAll('.room-card');
+
+      allCards.forEach(card => {
+        const roomNumber = card.textContent.toLowerCase();
+        if (roomNumber.includes(searchTerm)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Initialize
+    generateRoomCards();
+  </script>
+</body>
 </html>

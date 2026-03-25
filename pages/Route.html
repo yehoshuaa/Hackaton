@@ -1,136 +1,120 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Campus Navigatie Companion</title>
+  <title>Campus Navigation Companion</title>
   <link rel="stylesheet" href="../css/routestyle.css" />
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <button class="menu-btn" id="menuBtn" aria-label="Menu openen">
-          <span></span>
-          <span></span>
-          <span></span>
+        <button class="menu-btn" id="menuBtn" type="button" aria-label="Toggle menu">
+          <div>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </button>
         <div>
-          <h1>CNC Route</h1>
-          <p>Campus Navigatie Companion</p>
+          <h1>Campus Navigation</h1>
+          <p>Route viewer</p>
         </div>
       </div>
 
-      <div class="sidebar-card">
-        <h2>Route informatie</h2>
+      <section class="sidebar-card">
+        <h2>Route Details</h2>
         <div class="info-list">
           <div class="info-item">
-            <span class="label">Gebouw</span>
+            <span class="label">Building</span>
             <span class="value" id="buildingLabel">Circus</span>
           </div>
           <div class="info-item">
-            <span class="label">Verdieping</span>
+            <span class="label">Floor</span>
             <span class="value" id="floorLabel">AC1</span>
           </div>
           <div class="info-item">
-            <span class="label">Bestemming</span>
-            <span class="value" id="roomLabel">AC1.18</span>
+            <span class="label">Room</span>
+            <span class="value" id="roomLabel">AC1.20</span>
           </div>
           <div class="info-item">
-            <span class="label">Startpunt</span>
-            <span class="value">Roltrap</span>
+            <span class="label">Start</span>
+            <span class="value" id="startLabel">Nog niet gestart</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="sidebar-card">
-        <h2>Route type</h2>
+      <section class="sidebar-card">
+        <h2>Route Types</h2>
         <div class="route-type-list">
-          <button class="route-type-btn active" data-route-type="main">
-            Hoofdroute
-          </button>
-          <button class="route-type-btn" data-route-type="accessible">
-            Toegankelijke route
-          </button>
-          <button class="route-type-btn" data-route-type="quiet">
-            Rustige route
-          </button>
+          <button class="route-type-btn active" data-route-type="main" type="button">Main route</button>
+          <button class="route-type-btn" data-route-type="accessible" type="button">Accessible route</button>
+          <button class="route-type-btn" data-route-type="quiet" type="button">Quiet route</button>
         </div>
-      </div>
+      </section>
 
-      <div class="sidebar-card legend-card">
-        <h2>Legenda</h2>
+      <section class="sidebar-card legend-card">
+        <h2>Legend</h2>
         <div class="legend-row">
           <span class="legend-line main"></span>
-          <span>Hoofdroute</span>
+          <span>Main route</span>
         </div>
         <div class="legend-row">
           <span class="legend-line accessible"></span>
-          <span>Toegankelijke route</span>
+          <span>Accessible</span>
         </div>
         <div class="legend-row">
           <span class="legend-line quiet"></span>
-          <span>Alternatieve route</span>
+          <span>Quiet</span>
         </div>
         <div class="legend-row">
           <span class="legend-dot"></span>
-          <span>Startpunt gebruiker</span>
+          <span>Start point</span>
         </div>
-      </div>
+      </section>
     </aside>
 
     <main class="main-content">
       <header class="topbar">
         <div class="topbar-left">
-          <button class="back-btn" type="button" onclick="history.back()">&#8249;</button>
+          <button class="back-btn" type="button" onclick="history.back()"><</button>
           <div>
-            <div class="page-kicker">Route</div>
-            <h2 id="pageTitle">AC1.18</h2>
+            <div class="page-kicker">Navigation</div>
+            <h2 id="pageTitle">AC1.20</h2>
           </div>
-        </div>
-
-        <div class="topbar-right">
-          <button class="icon-control" id="zoomOutBtn" aria-label="Uitzoomen">−</button>
-          <button class="icon-control" id="zoomInBtn" aria-label="Inzoomen">+</button>
-          <button class="center-btn" id="centerBtn">Centreer</button>
         </div>
       </header>
 
       <section class="route-panel">
         <div class="map-toolbar">
-          <div class="status-chip" id="statusChip">Klaar om route te starten</div>
+          <div class="status-chip" id="statusChip">Ready</div>
 
           <div class="mobile-route-switcher">
             <select id="mobileRouteType">
-              <option value="main">Hoofdroute</option>
-              <option value="accessible">Toegankelijke route</option>
-              <option value="quiet">Alternatieve route</option>
+              <option value="main">Main route</option>
+              <option value="accessible">Accessible route</option>
+              <option value="quiet">Quiet route</option>
             </select>
           </div>
         </div>
 
-        <div class="map-wrapper">
-          <div class="map-viewport" id="mapViewport">
-            <div class="map-stage" id="mapStage">
-              <img
-                id="mapImage"
-                class="map-image"
-                src="assets/circus-1.png"
-                alt="Plattegrond Circus"
-              />
-              <svg id="routeSvg" class="route-svg"></svg>
-            </div>
+        <div class="canvas-area">
+          <div class="canvas-controls">
+            <button class="canvas-control-btn" id="zoomOutBtn" type="button">- Zoom Out</button>
+            <button class="canvas-control-btn" id="centerBtn" type="button">Center</button>
+            <button class="canvas-control-btn" id="zoomInBtn" type="button">+ Zoom In</button>
           </div>
 
-          <div class="map-hint">
-            Sleep om te bewegen • zoom met muis of vingers
+          <div class="canvas-wrapper">
+            <canvas id="mapCanvas" class="route-canvas"></canvas>
           </div>
         </div>
 
         <div class="actions">
-          <button class="action-btn primary" id="startRouteBtn">Route starten</button>
-          <button class="action-btn secondary" id="toggleAltRoutesBtn">Alternatieve routes</button>
-          <button class="action-btn ghost" id="arrivedBtn">Ik ben er al</button>
+          <button class="action-btn primary" id="startRouteBtn" type="button">Start Route</button>
+          <button class="action-btn secondary" id="toggleAltRoutesBtn" type="button">Toggle Alternative Route</button>
+          <button class="action-btn ghost" id="arrivedBtn" type="button">I Arrived</button>
         </div>
       </section>
     </main>
@@ -138,20 +122,11 @@
 
   <div class="modal hidden" id="arrivalModal">
     <div class="modal-card">
-      <h3>Je bent aangekomen</h3>
-      <p class="modal-room" id="modalRoomText">Lokaal AC1.18</p>
-      <p class="modal-course" id="modalCourseText">Bestemming bereikt</p>
-
-      <div class="cat-wrap">
-        <img
-          src="https://media.tenor.com/3x63SNMKPogAAAAi/cat-kitty.gif"
-          alt="feestende kat"
-        />
-      </div>
-
-      <div class="yippee">YIPPEE</div>
-
-      <button class="action-btn primary modal-btn" id="closeModalBtn">Klaar!</button>
+      <h3>Arrived</h3>
+      <p class="modal-room" id="modalRoomText">Lokaal AC1.20</p>
+      <p class="modal-course" id="modalCourseText">Advanced AR 2</p>
+      <div class="yippee">Nice work</div>
+      <button class="action-btn primary modal-btn" id="closeModalBtn" type="button">Close</button>
     </div>
   </div>
 

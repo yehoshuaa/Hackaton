@@ -1,148 +1,48 @@
-// ======================================
-// INSTELLINGEN
-// ======================================
-
-// Kies hier het lokaal.
-// Later kun je dit uit localStorage, URL params of een API halen.
-const selectedRoom = "AC1.18";
-
-// Optioneel: vaknaam / tekst in popup
+const urlParams = new URLSearchParams(window.location.search);
+const selectedRoom = urlParams.get("room") || "AC1.20";
 const selectedCourse = "Advanced AR 2";
-
-// ======================================
-// DATA
-// ======================================
-
-// Gebruik de PNG/JPG export van jouw echte plattegronden.
-// naturalWidth/naturalHeight moeten overeenkomen met de gebruikte afbeelding.
-// Pas deze aan als jouw export andere afmetingen heeft.
 
 const buildingData = {
   Circus: {
     AC1: {
-      image: "assets/circus-1.png",
+      image: "../pages/assets/circus-1.png",
       naturalWidth: 1182,
       naturalHeight: 790,
-      start: [784, 174], // ongeveer roltrap / kerngebied
       routes: {
-        "AC1.18": {
-          main: [
-            [784, 174],
-            [760, 174],
-            [760, 192],
-            [318, 192],
-            [318, 289]
-          ],
-          accessible: [
-            [784, 174],
-            [705, 174],
-            [705, 239],
-            [474, 239],
-            [474, 192],
-            [318, 192],
-            [318, 289]
-          ],
-          quiet: [
-            [784, 174],
-            [786, 240],
-            [542, 240],
-            [542, 434],
-            [286, 434],
-            [286, 289]
-          ]
-        },
-
         "AC1.20": {
-          main: [
-            [784, 174],
-            [760, 174],
-            [760, 192],
-            [318, 192],
-            [318, 368]
-          ],
-          accessible: [
-            [784, 174],
-            [705, 174],
-            [705, 239],
-            [474, 239],
-            [474, 192],
-            [318, 192],
-            [318, 368]
-          ],
-          quiet: [
-            [784, 174],
-            [786, 240],
-            [542, 240],
-            [542, 434],
-            [286, 434],
-            [286, 368]
-          ]
+          main: [[500, 300], [600, 320], [700, 350], [800, 400]],
+          accessible: [[500, 300], [560, 305], [650, 330], [760, 370]],
+          quiet: [[500, 300], [520, 360], [610, 410], [720, 430]]
         }
       }
     },
-
     AC2: {
-      image: "assets/circus-2.png",
+      image: "../pages/assets/circus-2.png",
       naturalWidth: 1039,
       naturalHeight: 808,
-      start: [752, 317], // bij kern / trap / liftzone
-      routes: {
-        "AC2.01": {
-          main: [
-            [752, 317],
-            [650, 317],
-            [650, 509],
-            [146, 509]
-          ],
-          accessible: [
-            [752, 317],
-            [650, 317],
-            [650, 649],
-            [120, 649],
-            [120, 509],
-            [146, 509]
-          ],
-          quiet: [
-            [752, 317],
-            [640, 317],
-            [640, 244],
-            [254, 244],
-            [254, 509],
-            [146, 509]
-          ]
-        },
-
-        "AC2.38": {
-          main: [
-            [752, 317],
-            [650, 317],
-            [650, 548],
-            [301, 548]
-          ],
-          accessible: [
-            [752, 317],
-            [650, 317],
-            [650, 649],
-            [301, 649],
-            [301, 548]
-          ],
-          quiet: [
-            [752, 317],
-            [640, 317],
-            [640, 244],
-            [254, 244],
-            [254, 548],
-            [301, 548]
-          ]
-        }
-      }
+      routes: {}
     }
   }
 };
 
-// ======================================
-// HULPFUNCTIES
-// ======================================
+function mergeSavedRoutes() {
+  const saved = localStorage.getItem("schoolRoutes");
+  if (!saved) return;
+
+  try {
+    const parsedRoutes = JSON.parse(saved);
+
+    Object.entries(parsedRoutes).forEach(([floorKey, roomRoutes]) => {
+      if (!buildingData.Circus[floorKey]) return;
+      buildingData.Circus[floorKey].routes = {
+        ...buildingData.Circus[floorKey].routes,
+        ...roomRoutes
+      };
+    });
+  } catch (error) {
+    console.warn("Could not parse saved routes.", error);
+  }
+}
 
 function getFloorFromRoom(room) {
   if (room.startsWith("AC1.")) return "AC1";
@@ -155,49 +55,15 @@ function getBuildingFromRoom(room) {
   return "Circus";
 }
 
-function getRouteColor(routeType) {
-  if (routeType === "accessible") return "#1eb06a";
-  if (routeType === "quiet") return "#4f94d3";
-  return "#111111";
+function getRouteColor(type) {
+  return {
+    main: "#111111",
+    accessible: "#1eb06a",
+    quiet: "#4f94d3"
+  }[type] || "#111111";
 }
 
-function getRouteClass(routeType) {
-  if (routeType === "accessible") return "route-path accessible";
-  if (routeType === "quiet") return "route-path quiet";
-  return "route-path";
-}
-
-function createPathData(points) {
-  return points
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point[0]} ${point[1]}`)
-    .join(" ");
-}
-
-function createArrow(points, color) {
-  if (points.length < 2) return "";
-
-  const a = points[points.length - 2];
-  const b = points[points.length - 1];
-  const angle = Math.atan2(b[1] - a[1], b[0] - a[0]);
-  const size = 18;
-
-  const x1 = b[0] - size * Math.cos(angle - Math.PI / 6);
-  const y1 = b[1] - size * Math.sin(angle - Math.PI / 6);
-  const x2 = b[0] - size * Math.cos(angle + Math.PI / 6);
-  const y2 = b[1] - size * Math.sin(angle + Math.PI / 6);
-
-  return `
-    <polygon
-      points="${b[0]},${b[1]} ${x1},${y1} ${x2},${y2}"
-      fill="${color}"
-      vector-effect="non-scaling-stroke"
-    />
-  `;
-}
-
-// ======================================
-// BASIS
-// ======================================
+mergeSavedRoutes();
 
 const currentBuilding = getBuildingFromRoom(selectedRoom);
 const currentFloor = getFloorFromRoom(selectedRoom);
@@ -209,30 +75,37 @@ const roomLabel = document.getElementById("roomLabel");
 const pageTitle = document.getElementById("pageTitle");
 const modalRoomText = document.getElementById("modalRoomText");
 const modalCourseText = document.getElementById("modalCourseText");
-
-const mapImage = document.getElementById("mapImage");
-const routeSvg = document.getElementById("routeSvg");
-const mapViewport = document.getElementById("mapViewport");
-const mapStage = document.getElementById("mapStage");
-
 const statusChip = document.getElementById("statusChip");
-
+const startLabel = document.getElementById("startLabel");
 const startRouteBtn = document.getElementById("startRouteBtn");
 const toggleAltRoutesBtn = document.getElementById("toggleAltRoutesBtn");
 const arrivedBtn = document.getElementById("arrivedBtn");
-
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
 const centerBtn = document.getElementById("centerBtn");
-
 const arrivalModal = document.getElementById("arrivalModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
-
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
-
 const mobileRouteType = document.getElementById("mobileRouteType");
 const routeTypeButtons = document.querySelectorAll(".route-type-btn");
+
+let canvas;
+let ctx;
+let currentImage = null;
+let currentRouteType = "main";
+let currentRoute = null;
+let showAlternativeState = false;
+let zoomLevel = 1;
+let panX = 0;
+let panY = 0;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let panStartX = 0;
+let panStartY = 0;
+let pinchStartDistance = 0;
+let pinchStartZoom = 1;
 
 buildingLabel.textContent = currentBuilding;
 floorLabel.textContent = currentFloor;
@@ -241,61 +114,147 @@ pageTitle.textContent = selectedRoom;
 modalRoomText.textContent = `Lokaal ${selectedRoom}`;
 modalCourseText.textContent = selectedCourse;
 
-mapImage.src = floorData.image;
+function getCanvasWrapperSize() {
+  const wrapper = canvas.parentElement;
+  return {
+    width: wrapper.clientWidth,
+    height: wrapper.clientHeight
+  };
+}
 
-// ======================================
-// ROUTE STATE
-// ======================================
+function resizeCanvasToWrapper() {
+  const { width, height } = getCanvasWrapperSize();
+  canvas.width = width;
+  canvas.height = height;
+}
 
-let currentRouteType = "main";
-let routeStarted = false;
-let showAlternativeState = false;
+function getImageDrawData() {
+  if (!currentImage) return null;
 
-// ======================================
-// RENDER ROUTE
-// ======================================
+  const baseScale = Math.min(
+    canvas.width / currentImage.width,
+    canvas.height / currentImage.height
+  );
+  const scale = baseScale * zoomLevel;
+  const drawWidth = currentImage.width * scale;
+  const drawHeight = currentImage.height * scale;
+  const offsetX = (canvas.width - drawWidth) / 2 + panX;
+  const offsetY = (canvas.height - drawHeight) / 2 + panY;
 
-function renderRoute(routeType = "main") {
-  const roomRoutes = floorData.routes[selectedRoom];
+  return { scale, drawWidth, drawHeight, offsetX, offsetY };
+}
 
-  if (!roomRoutes) {
-    statusChip.textContent = `Geen routegegevens gevonden voor ${selectedRoom}`;
-    routeSvg.innerHTML = "";
-    return;
+function getResponsiveRouteMetrics() {
+  const isPhone = window.innerWidth <= 640;
+
+  return {
+    lineWidth: isPhone ? 5 : 8,
+    startRadius: isPhone ? 7 : 10,
+    pointRadius: isPhone ? 4 : 6,
+    outlineWidth: isPhone ? 1.5 : 2,
+    arrowSize: isPhone ? 14 : 20,
+    labelOffsetX: isPhone ? 12 : 16,
+    labelOffsetY: isPhone ? 12 : 16,
+    font: isPhone ? "700 14px Segoe UI" : "700 18px Segoe UI"
+  };
+}
+
+function drawRoute(points, color, opacity, scale, offsetX, offsetY) {
+  if (!points || points.length === 0) return;
+
+  const metrics = getResponsiveRouteMetrics();
+
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = metrics.lineWidth;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  ctx.beginPath();
+  ctx.moveTo(points[0][0] * scale + offsetX, points[0][1] * scale + offsetY);
+
+  for (let i = 1; i < points.length; i += 1) {
+    ctx.lineTo(points[i][0] * scale + offsetX, points[i][1] * scale + offsetY);
+  }
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  points.forEach((point, index) => {
+    const drawX = point[0] * scale + offsetX;
+    const drawY = point[1] * scale + offsetY;
+
+    ctx.beginPath();
+    ctx.arc(drawX, drawY, index === 0 ? metrics.startRadius : metrics.pointRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = metrics.outlineWidth;
+    ctx.stroke();
+  });
+
+  const startPoint = points[0];
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "#111111";
+  ctx.font = metrics.font;
+  ctx.fillText(
+    "Start",
+    startPoint[0] * scale + offsetX + metrics.labelOffsetX,
+    startPoint[1] * scale + offsetY - metrics.labelOffsetY
+  );
+
+  if (points.length > 1) {
+    const last = points[points.length - 1];
+    const prev = points[points.length - 2];
+    const lastX = last[0] * scale + offsetX;
+    const lastY = last[1] * scale + offsetY;
+    const prevX = prev[0] * scale + offsetX;
+    const prevY = prev[1] * scale + offsetY;
+    const angle = Math.atan2(lastY - prevY, lastX - prevX);
+    const size = metrics.arrowSize;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(
+      lastX - size * Math.cos(angle - Math.PI / 6),
+      lastY - size * Math.sin(angle - Math.PI / 6)
+    );
+    ctx.lineTo(
+      lastX - size * Math.cos(angle + Math.PI / 6),
+      lastY - size * Math.sin(angle + Math.PI / 6)
+    );
+    ctx.closePath();
+    ctx.fill();
   }
 
-  const points = roomRoutes[routeType];
-  const start = floorData.start;
-  const color = getRouteColor(routeType);
-  const routeClass = getRouteClass(routeType);
+  ctx.restore();
+}
 
-  routeSvg.setAttribute(
-    "viewBox",
-    `0 0 ${floorData.naturalWidth} ${floorData.naturalHeight}`
+function drawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!currentImage) return;
+
+  const drawData = getImageDrawData();
+  if (!drawData) return;
+
+  const { scale, drawWidth, drawHeight, offsetX, offsetY } = drawData;
+
+  ctx.drawImage(
+    currentImage,
+    0,
+    0,
+    currentImage.width,
+    currentImage.height,
+    offsetX,
+    offsetY,
+    drawWidth,
+    drawHeight
   );
-  routeSvg.setAttribute("width", floorData.naturalWidth);
-  routeSvg.setAttribute("height", floorData.naturalHeight);
 
-  routeSvg.innerHTML = `
-    <path class="${routeClass}" d="${createPathData(points)}"></path>
-    <circle class="start-dot" cx="${start[0]}" cy="${start[1]}" r="10"></circle>
-    <text class="route-text" x="${start[0] + 18}" y="${start[1] - 18}">
-      Start
-    </text>
-    ${createArrow(points, color)}
-  `;
-
-  currentRouteType = routeType;
-  routeStarted = true;
-
-  const labelMap = {
-    main: "Hoofdroute actief",
-    accessible: "Toegankelijke route actief",
-    quiet: "Alternatieve route actief"
-  };
-
-  statusChip.textContent = `${selectedRoom} • ${labelMap[routeType]}`;
-  syncRouteButtons(routeType);
+  if (currentRoute) {
+    drawRoute(currentRoute.points, getRouteColor(currentRoute.routeType), 1, scale, offsetX, offsetY);
+  }
 }
 
 function syncRouteButtons(routeType) {
@@ -303,7 +262,82 @@ function syncRouteButtons(routeType) {
     button.classList.toggle("active", button.dataset.routeType === routeType);
   });
 
-  mobileRouteType.value = routeType;
+  if (mobileRouteType) {
+    mobileRouteType.value = routeType;
+  }
+}
+
+function renderRoute(routeType = "main") {
+  const roomRoutes = floorData.routes[selectedRoom];
+
+  if (!roomRoutes) {
+    currentRoute = null;
+    startLabel.textContent = "Geen route";
+    statusChip.textContent = `Geen routegegevens gevonden voor ${selectedRoom}`;
+    drawCanvas();
+    return;
+  }
+
+  const points = roomRoutes[routeType];
+  if (!points || points.length === 0) {
+    currentRoute = null;
+    startLabel.textContent = "Geen route";
+    statusChip.textContent = `Geen ${routeType}-route gevonden voor ${selectedRoom}`;
+    drawCanvas();
+    return;
+  }
+
+  currentRouteType = routeType;
+  currentRoute = { points, routeType };
+  startLabel.textContent = `[${points[0][0]}, ${points[0][1]}]`;
+  statusChip.textContent = `${selectedRoom} • ${routeType} route`;
+  syncRouteButtons(routeType);
+  drawCanvas();
+}
+
+function setZoom(nextZoom) {
+  zoomLevel = Math.max(1, Math.min(nextZoom, 3));
+  drawCanvas();
+}
+
+function setZoomAroundPoint(nextZoom, anchorX, anchorY) {
+  const clampedZoom = Math.max(1, Math.min(nextZoom, 3));
+  if (clampedZoom === zoomLevel) return;
+
+  const zoomRatio = clampedZoom / zoomLevel;
+  panX = anchorX - (anchorX - panX) * zoomRatio;
+  panY = anchorY - (anchorY - panY) * zoomRatio;
+  zoomLevel = clampedZoom;
+  drawCanvas();
+}
+
+function resetView() {
+  zoomLevel = 1;
+  panX = 0;
+  panY = 0;
+  drawCanvas();
+}
+
+function beginDrag(clientX, clientY) {
+  isDragging = true;
+  dragStartX = clientX;
+  dragStartY = clientY;
+  panStartX = panX;
+  panStartY = panY;
+  canvas.style.cursor = "grabbing";
+}
+
+function updateDrag(clientX, clientY) {
+  if (!isDragging) return;
+
+  panX = panStartX + (clientX - dragStartX);
+  panY = panStartY + (clientY - dragStartY);
+  drawCanvas();
+}
+
+function endDrag() {
+  isDragging = false;
+  canvas.style.cursor = "grab";
 }
 
 function toggleAlternativeMode() {
@@ -316,249 +350,134 @@ function toggleAlternativeMode() {
 
   if (currentRouteType === "main") {
     renderRoute("accessible");
-  } else if (currentRouteType === "accessible") {
+    return;
+  }
+
+  if (currentRouteType === "accessible") {
     renderRoute("quiet");
-  } else {
-    renderRoute("main");
-  }
-}
-
-// ======================================
-// ZOOM + PAN
-// ======================================
-
-let scale = 1;
-let minScale = 1;
-let maxScale = 4;
-let posX = 0;
-let posY = 0;
-let dragging = false;
-let dragStartX = 0;
-let dragStartY = 0;
-let lastTouchDistance = null;
-
-function setStageSize() {
-  const rect = mapImage.getBoundingClientRect();
-
-  mapStage.style.width = `${rect.width}px`;
-  mapStage.style.height = `${rect.height}px`;
-
-  routeSvg.style.width = `${rect.width}px`;
-  routeSvg.style.height = `${rect.height}px`;
-}
-
-function centerMap() {
-  const viewportRect = mapViewport.getBoundingClientRect();
-
-  const naturalRatio = floorData.naturalWidth / floorData.naturalHeight;
-  const viewportRatio = viewportRect.width / viewportRect.height;
-
-  if (naturalRatio > viewportRatio) {
-    scale = viewportRect.width / floorData.naturalWidth;
-  } else {
-    scale = viewportRect.height / floorData.naturalHeight;
+    return;
   }
 
-  minScale = scale;
-
-  const scaledWidth = floorData.naturalWidth * scale;
-  const scaledHeight = floorData.naturalHeight * scale;
-
-  posX = (viewportRect.width - scaledWidth) / 2;
-  posY = (viewportRect.height - scaledHeight) / 2;
-
-  applyTransform();
+  renderRoute("main");
 }
 
-function clampPosition() {
-  const viewportRect = mapViewport.getBoundingClientRect();
-  const width = floorData.naturalWidth * scale;
-  const height = floorData.naturalHeight * scale;
+window.onload = function() {
+  canvas = document.getElementById("mapCanvas");
+  ctx = canvas.getContext("2d");
+  canvas.style.cursor = "grab";
 
-  const minX = Math.min(0, viewportRect.width - width);
-  const minY = Math.min(0, viewportRect.height - height);
+  currentImage = new Image();
+  currentImage.onload = function() {
+    resizeCanvasToWrapper();
+    renderRoute(currentRouteType);
+  };
+  currentImage.src = floorData.image;
 
-  const maxX = width < viewportRect.width ? (viewportRect.width - width) / 2 : 0;
-  const maxY = height < viewportRect.height ? (viewportRect.height - height) / 2 : 0;
+  startRouteBtn.addEventListener("click", () => renderRoute(currentRouteType));
+  toggleAltRoutesBtn.addEventListener("click", toggleAlternativeMode);
+  arrivedBtn.addEventListener("click", () => arrivalModal.classList.remove("hidden"));
+  closeModalBtn.addEventListener("click", () => arrivalModal.classList.add("hidden"));
+  zoomInBtn.addEventListener("click", () => setZoom(zoomLevel * 1.2));
+  zoomOutBtn.addEventListener("click", () => setZoom(zoomLevel / 1.2));
+  centerBtn.addEventListener("click", resetView);
 
-  posX = Math.max(minX, Math.min(maxX, posX));
-  posY = Math.max(minY, Math.min(maxY, posY));
-}
-
-function applyTransform() {
-  setStageSize();
-  clampPosition();
-  mapStage.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-}
-
-function zoomAt(clientX, clientY, nextScale) {
-  const rect = mapViewport.getBoundingClientRect();
-  const px = clientX - rect.left;
-  const py = clientY - rect.top;
-
-  const worldX = (px - posX) / scale;
-  const worldY = (py - posY) / scale;
-
-  scale = Math.max(minScale, Math.min(maxScale, nextScale));
-
-  posX = px - worldX * scale;
-  posY = py - worldY * scale;
-
-  applyTransform();
-}
-
-function getTouchDistance(t1, t2) {
-  const dx = t1.clientX - t2.clientX;
-  const dy = t1.clientY - t2.clientY;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-// Mouse
-mapViewport.addEventListener("mousedown", (event) => {
-  dragging = true;
-  mapViewport.classList.add("dragging");
-  dragStartX = event.clientX - posX;
-  dragStartY = event.clientY - posY;
-});
-
-window.addEventListener("mousemove", (event) => {
-  if (!dragging) return;
-  posX = event.clientX - dragStartX;
-  posY = event.clientY - dragStartY;
-  applyTransform();
-});
-
-window.addEventListener("mouseup", () => {
-  dragging = false;
-  mapViewport.classList.remove("dragging");
-});
-
-mapViewport.addEventListener(
-  "wheel",
-  (event) => {
-    event.preventDefault();
-    const factor = event.deltaY < 0 ? 1.15 : 0.88;
-    zoomAt(event.clientX, event.clientY, scale * factor);
-  },
-  { passive: false }
-);
-
-// Touch
-mapViewport.addEventListener(
-  "touchstart",
-  (event) => {
-    if (event.touches.length === 1) {
-      dragging = true;
-      dragStartX = event.touches[0].clientX - posX;
-      dragStartY = event.touches[0].clientY - posY;
-    } else if (event.touches.length === 2) {
-      dragging = false;
-      lastTouchDistance = getTouchDistance(event.touches[0], event.touches[1]);
-    }
-  },
-  { passive: false }
-);
-
-mapViewport.addEventListener(
-  "touchmove",
-  (event) => {
-    event.preventDefault();
-
-    if (event.touches.length === 1 && dragging) {
-      posX = event.touches[0].clientX - dragStartX;
-      posY = event.touches[0].clientY - dragStartY;
-      applyTransform();
-    } else if (event.touches.length === 2) {
-      const newDistance = getTouchDistance(event.touches[0], event.touches[1]);
-
-      if (lastTouchDistance) {
-        const centerX =
-          (event.touches[0].clientX + event.touches[1].clientX) / 2;
-        const centerY =
-          (event.touches[0].clientY + event.touches[1].clientY) / 2;
-
-        zoomAt(centerX, centerY, scale * (newDistance / lastTouchDistance));
-      }
-
-      lastTouchDistance = newDistance;
-    }
-  },
-  { passive: false }
-);
-
-mapViewport.addEventListener("touchend", () => {
-  dragging = false;
-  lastTouchDistance = null;
-});
-
-// ======================================
-// BUTTONS
-// ======================================
-
-startRouteBtn.addEventListener("click", () => {
-  renderRoute(currentRouteType || "main");
-});
-
-toggleAltRoutesBtn.addEventListener("click", () => {
-  toggleAlternativeMode();
-});
-
-arrivedBtn.addEventListener("click", () => {
-  arrivalModal.classList.remove("hidden");
-});
-
-closeModalBtn.addEventListener("click", () => {
-  arrivalModal.classList.add("hidden");
-});
-
-zoomInBtn.addEventListener("click", () => {
-  const rect = mapViewport.getBoundingClientRect();
-  zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, scale * 1.2);
-});
-
-zoomOutBtn.addEventListener("click", () => {
-  const rect = mapViewport.getBoundingClientRect();
-  zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, scale / 1.2);
-});
-
-centerBtn.addEventListener("click", () => {
-  centerMap();
-  if (routeStarted) renderRoute(currentRouteType);
-});
-
-routeTypeButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const routeType = button.dataset.routeType;
-    renderRoute(routeType);
+  routeTypeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      showAlternativeState = button.dataset.routeType !== "main";
+      renderRoute(button.dataset.routeType);
+    });
   });
-});
 
-mobileRouteType.addEventListener("change", (event) => {
-  renderRoute(event.target.value);
-});
-
-menuBtn.addEventListener("click", () => {
-  sidebar.classList.toggle("open");
-});
-
-window.addEventListener("click", (event) => {
-  const clickedMenu = event.target.closest("#menuBtn");
-  const clickedSidebar = event.target.closest("#sidebar");
-
-  if (window.innerWidth <= 980 && !clickedMenu && !clickedSidebar) {
-    sidebar.classList.remove("open");
+  if (mobileRouteType) {
+    mobileRouteType.addEventListener("change", (event) => {
+      showAlternativeState = event.target.value !== "main";
+      renderRoute(event.target.value);
+    });
   }
-});
 
-// ======================================
-// INIT
-// ======================================
+  menuBtn.addEventListener("click", () => sidebar.classList.toggle("open"));
 
-mapImage.addEventListener("load", () => {
-  centerMap();
-});
+  window.addEventListener("click", (event) => {
+    const clickedMenu = event.target.closest("#menuBtn");
+    const clickedSidebar = event.target.closest("#sidebar");
+
+    if (window.innerWidth <= 980 && !clickedMenu && !clickedSidebar) {
+      sidebar.classList.remove("open");
+    }
+  });
+
+  canvas.addEventListener("mousedown", (event) => {
+    beginDrag(event.clientX, event.clientY);
+  });
+
+  window.addEventListener("mousemove", (event) => {
+    updateDrag(event.clientX, event.clientY);
+  });
+
+  window.addEventListener("mouseup", () => {
+    endDrag();
+  });
+
+  canvas.addEventListener("touchstart", (event) => {
+    if (event.touches.length === 2) {
+      const [touchA, touchB] = event.touches;
+      pinchStartDistance = Math.hypot(
+        touchB.clientX - touchA.clientX,
+        touchB.clientY - touchA.clientY
+      );
+      pinchStartZoom = zoomLevel;
+      isDragging = false;
+      return;
+    }
+
+    if (event.touches.length === 1) {
+      beginDrag(event.touches[0].clientX, event.touches[0].clientY);
+    }
+  });
+
+  canvas.addEventListener("touchmove", (event) => {
+    if (event.touches.length === 2) {
+      const [touchA, touchB] = event.touches;
+      const currentDistance = Math.hypot(
+        touchB.clientX - touchA.clientX,
+        touchB.clientY - touchA.clientY
+      );
+
+      if (pinchStartDistance > 0) {
+        const rect = canvas.getBoundingClientRect();
+        const anchorX = ((touchA.clientX + touchB.clientX) / 2) - rect.left;
+        const anchorY = ((touchA.clientY + touchB.clientY) / 2) - rect.top;
+        const nextZoom = pinchStartZoom * (currentDistance / pinchStartDistance);
+        setZoomAroundPoint(nextZoom, anchorX, anchorY);
+      }
+      return;
+    }
+
+    if (!isDragging || event.touches.length !== 1) return;
+
+    updateDrag(event.touches[0].clientX, event.touches[0].clientY);
+  }, { passive: true });
+
+  canvas.addEventListener("touchend", () => {
+    pinchStartDistance = 0;
+    pinchStartZoom = zoomLevel;
+    endDrag();
+  });
+
+  canvas.addEventListener("wheel", (event) => {
+    event.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const anchorX = event.clientX - rect.left;
+    const anchorY = event.clientY - rect.top;
+    const zoomFactor = event.deltaY < 0 ? 1.1 : 1 / 1.1;
+
+    setZoomAroundPoint(zoomLevel * zoomFactor, anchorX, anchorY);
+  }, { passive: false });
+};
 
 window.addEventListener("resize", () => {
-  centerMap();
-  if (routeStarted) renderRoute(currentRouteType);
+  if (!canvas || !ctx || !currentImage) return;
+  resizeCanvasToWrapper();
+  drawCanvas();
 });
