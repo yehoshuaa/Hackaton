@@ -208,7 +208,8 @@ if (loginForm) {
     const password = document.getElementById("password").value.trim();
 
     if (email === "jeremy@windesheim.nl" && password === "Hallo123") {
-      window.location.href = "home.html";
+      sessionStorage.setItem("showStarterGuide", "true");
+      window.location.href = "HomePagina.html";
     } else {
       openModal(errorModal);
     }

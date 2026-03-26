@@ -155,6 +155,10 @@ let panStartX = 0;
 let panStartY = 0;
 let pinchStartDistance = 0;
 let pinchStartZoom = 1;
+let isRouteGuidanceActive = false;
+let routeAnimationFrameId = 0;
+let routeDashOffset = 0;
+let routeBlinkPhase = 0;
 
 buildingLabel.textContent = currentBuilding;
 floorLabel.textContent = currentFloor;
@@ -227,6 +231,26 @@ function drawRoute(points, color, opacity, scale, offsetX, offsetY) {
     ctx.lineTo(points[i][0] * scale + offsetX, points[i][1] * scale + offsetY);
   }
   ctx.stroke();
+
+  if (isRouteGuidanceActive) {
+    ctx.save();
+    ctx.globalAlpha = 0.35 + (Math.sin(routeBlinkPhase) + 1) * 0.25;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = Math.max(3, metrics.lineWidth * 0.45);
+    ctx.setLineDash([18, 12]);
+    ctx.lineDashOffset = routeDashOffset;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(points[0][0] * scale + offsetX, points[0][1] * scale + offsetY);
+
+    for (let i = 1; i < points.length; i += 1) {
+      ctx.lineTo(points[i][0] * scale + offsetX, points[i][1] * scale + offsetY);
+    }
+
+    ctx.stroke();
+    ctx.restore();
+  }
 
   ctx.fillStyle = color;
   points.forEach((point, index) => {
@@ -316,10 +340,77 @@ function syncRouteButtons(routeType) {
   }
 }
 
+function getMissingMapState() {
+  if (window.routeStateHelpers && typeof window.routeStateHelpers.formatMissingMapState === "function") {
+    return window.routeStateHelpers.formatMissingMapState(selectedRoom, t);
+  }
+
+  return {
+    startLabel: t("routeNoRoute"),
+    statusChip: t("routeNoDataForRoom", { room: selectedRoom })
+  };
+}
+
+function handleMapImageError() {
+  const missingMapState = getMissingMapState();
+
+  stopRouteGuidance(false);
+  currentImage = null;
+  currentRoute = null;
+  startLabel.textContent = missingMapState.startLabel;
+  statusChip.textContent = missingMapState.statusChip;
+  syncRouteButtons("main");
+
+  if (ctx && canvas) {
+    drawCanvas();
+  }
+}
+
+function animateRouteGuidance() {
+  if (!isRouteGuidanceActive) {
+    routeAnimationFrameId = 0;
+    return;
+  }
+
+  routeDashOffset -= 2;
+  routeBlinkPhase += 0.14;
+  drawCanvas();
+  routeAnimationFrameId = window.requestAnimationFrame(animateRouteGuidance);
+}
+
+function startRouteGuidance() {
+  if (!currentRoute) {
+    return;
+  }
+
+  isRouteGuidanceActive = true;
+
+  if (!routeAnimationFrameId) {
+    routeAnimationFrameId = window.requestAnimationFrame(animateRouteGuidance);
+  }
+}
+
+function stopRouteGuidance(shouldRedraw = true) {
+  isRouteGuidanceActive = false;
+
+  if (routeAnimationFrameId) {
+    window.cancelAnimationFrame(routeAnimationFrameId);
+    routeAnimationFrameId = 0;
+  }
+
+  routeDashOffset = 0;
+  routeBlinkPhase = 0;
+
+  if (shouldRedraw && ctx && canvas) {
+    drawCanvas();
+  }
+}
+
 function renderRoute(routeType = "main") {
   const roomRoutes = floorData.routes[selectedRoom];
 
   if (!roomRoutes) {
+    stopRouteGuidance(false);
     currentRoute = null;
     startLabel.textContent = t("routeNoRoute");
     statusChip.textContent = t("routeNoDataForRoom", { room: selectedRoom });
@@ -329,6 +420,7 @@ function renderRoute(routeType = "main") {
 
   const points = roomRoutes[routeType];
   if (!points || points.length === 0) {
+    stopRouteGuidance(false);
     currentRoute = null;
     startLabel.textContent = t("routeNoRoute");
     statusChip.textContent = t("routeNoTypeForRoom", { type: routeType, room: selectedRoom });
@@ -342,6 +434,10 @@ function renderRoute(routeType = "main") {
   statusChip.textContent = `${selectedRoom} • ${routeType} route`;
   syncRouteButtons(routeType);
   drawCanvas();
+
+  if (isRouteGuidanceActive) {
+    startRouteGuidance();
+  }
 }
 
 function setZoom(nextZoom) {
@@ -430,12 +526,17 @@ window.onload = function() {
     resizeCanvasToWrapper();
     renderRoute(currentRouteType);
   };
+  currentImage.onerror = handleMapImageError;
   currentImage.src = floorData.image;
 
-  startRouteBtn.addEventListener("click", () => renderRoute(currentRouteType));
+  startRouteBtn.addEventListener("click", () => {
+    renderRoute(currentRouteType);
+    startRouteGuidance();
+  });
   toggleAltRoutesBtn.addEventListener("click", toggleAlternativeMode);
   arrivedBtn.addEventListener("click", () => arrivalModal.classList.remove("hidden"));
   closeModalBtn.addEventListener("click", () => {
+    stopRouteGuidance();
     arrivalModal.classList.add("hidden");
     window.location.href = "HomePagina.html";
   });
