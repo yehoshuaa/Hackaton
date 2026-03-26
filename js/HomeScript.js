@@ -1,3 +1,5 @@
+const searchBox = document.getElementById("searchBox");
+const searchError = document.getElementById("searchError");
 const ROOSTER_API_URL = "https://ical.windesheim.nl/api/Rooster-v10?culture=en&key=a77430f8-e6c3-4127-9864-ec966b839427";
 const ROOSTER_PROXY_URL = `https://cors.utilitytool.app/${ROOSTER_API_URL}`;
 const DAYS_TO_SHOW = 7;
@@ -45,7 +47,60 @@ const buildingImageSets = {
     }
 };
 
+const validRooms = [
+    "AC1.18",
+    "AC1.20",
+    "AC1.22",
+    "AC1.24",
+    "AC1.26",
+    "AC1.28",
+    "AC1.30"
+];
 
+function normalizeRoomInput(input) {
+    if (!input) {
+        return "";
+    }
+
+    return input
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, "");
+}
+
+function showSearchError(message) {
+    searchError.textContent = message;
+}
+
+function clearSearchError() {
+    searchError.textContent = "";
+}
+
+function handleRoomSearch() {
+    const normalizedRoom = normalizeRoomInput(searchBox.value);
+
+    if (!normalizedRoom) {
+        showSearchError("Voer een lokaal in");
+        return;
+    }
+
+    if (!validRooms.includes(normalizedRoom)) {
+        showSearchError("Dit lokaal bestaat niet");
+        return;
+    }
+
+    clearSearchError();
+    window.location.href = `Route.html?room=${encodeURIComponent(normalizedRoom)}`;
+}
+
+searchBox.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        handleRoomSearch();
+    }
+});
+searchBox.addEventListener("input", function () {
+    clearSearchError();
+});
 
 
 function getSelectedBuildingConfig() {
