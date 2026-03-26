@@ -49,13 +49,22 @@
         <section class="map-content" id="mapContent">
             <div class="content-layout">
                 <div class="map-section">
-                    <img
-                        id="mapImage"
-                        class="map-image"
-                        src="assets/circus-1.png"
-                        alt="Plattegrond verdieping 1">
+                    <div class="map-toolbar">
+                        <button type="button" class="map-tool-btn" id="zoomOutBtn">−</button>
+                        <button type="button" class="map-tool-btn" id="resetMapBtn">Reset</button>
+                        <button type="button" class="map-tool-btn" id="zoomInBtn">+</button>
+                    </div>
+
+                    <div class="map-viewer" id="mapViewer">
+                        <img
+                            id="mapImage"
+                            class="map-image"
+                            src="assets/circus-1.png"
+                            alt="Plattegrond verdieping 1"
+                            draggable="false">
+                    </div>
                 </div>
-                <aside class="floor-section">
+                            <aside class="floor-section">
                     <div class="floor-buttons" id="floorButtons"></div>
                 </aside>
             </div>
