@@ -539,23 +539,6 @@
       drawGrid(offsetX, offsetY, drawWidth, drawHeight, scale);
     }
 
-    const floor = document.getElementById('floorSelect').value;
-
-    if (allRoutes[floor]) {
-      Object.keys(allRoutes[floor]).forEach(room => {
-        Object.keys(allRoutes[floor][room]).forEach(type => {
-          drawRoute(
-            allRoutes[floor][room][type],
-            getRouteColor(type),
-            0.3,
-            scale,
-            offsetX,
-            offsetY
-          );
-        });
-      });
-    }
-
     if (currentPoints.length > 0) {
       const type = document.getElementById('routeType').value;
       drawRoute(currentPoints, getRouteColor(type), 1, scale, offsetX, offsetY);
@@ -683,15 +666,16 @@ async function saveRoute() {
       throw new Error(result.error || 'Unknown server error');
     }
 
-    currentPoints = [];
-    updateUI();
-    drawCanvas();
     generateCode();
 
     showStatus(`✓ Route saved for ${room} (${type}) and written to routescript.js`, 'success');
   } catch (error) {
     console.error(error);
     showStatus(`Could not save to routescript.js: ${error.message}`, 'danger');
+  } finally {
+    currentPoints = [];
+    updateUI();
+    drawCanvas();
   }
 }
 
