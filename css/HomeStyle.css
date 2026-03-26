@@ -512,4 +512,11 @@
             background: #f16682;
             color: #111;
         }
+
+        .search-error {
+            min-height: 20px;
+            font-size: 14px;
+            color: #ff4d4d;
+            margin-top: -8px;
+        }
     
