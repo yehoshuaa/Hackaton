@@ -58,7 +58,7 @@ function decodeLessonIcsText(value) {
 
 function splitLessonRooms(roomValue) {
   return decodeLessonIcsText(roomValue)
-    .split(/[;,]/)
+    .split(";")
     .map((room) => room.trim())
     .filter(Boolean);
 }

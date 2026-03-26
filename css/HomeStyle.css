@@ -22,6 +22,11 @@
             font-size: 1.08em;
         }
 
+        body.large-text .hamburger-btn,
+        body.large-text .page-title {
+            font-size: 1.60em !important;
+        }
+
         body.high-contrast {
             background: #000;
             color: #fff;
@@ -65,9 +70,56 @@
             box-shadow: none !important;
         }
 
+        body.high-contrast .building-select option {
+            background: #000 !important;
+            color: #fff !important;
+        }
+
         body.high-contrast .menu-top,
         body.high-contrast .menu-list li {
             border-color: #fff !important;
+        }
+
+        body.high-contrast .lesson-card,
+        body.high-contrast .lesson-card.highlight,
+        body.high-contrast .empty-day {
+            background: transparent !important;
+            border: 2px solid #fff !important;
+            box-shadow: none !important;
+        }
+
+        body.high-contrast .day-title,
+        body.high-contrast .lesson-time {
+            color: #ffd84d !important;
+        }
+
+        body.high-contrast .location-modal {
+            background: #000 !important;
+            border: 2px solid #fff !important;
+            color: #fff !important;
+        }
+
+        body.high-contrast .location-modal h2,
+        body.high-contrast .location-modal-label,
+        body.high-contrast .location-modal-course,
+        body.high-contrast .close-modal-btn {
+            color: #fff !important;
+        }
+
+        body.high-contrast .location-buttons {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        body.high-contrast .location-option-btn {
+            background: transparent !important;
+            color: #fff !important;
+            border: 2px solid #fff !important;
+        }
+
+        body.high-contrast .location-option-btn + .location-option-btn {
+            border-top: none !important;
+            margin-top: 10px;
         }
 
         body.high-contrast .menu-list a:hover,
@@ -81,9 +133,8 @@
         header {
             border-bottom: 1px solid #dddddd00;
             padding: 16px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            position: relative;
+            z-index: 10;
         }
 
         main {
@@ -97,22 +148,29 @@
         .header-inner {
             max-width: 1100px;
             margin: 0 auto;
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
             gap: 16px;
+            min-height: 56px;
         }
 
         .hamburger-btn {
             background: none;
             border: none;
-            font-size: 28px;
+            font-size: 1.60em;
             cursor: pointer;
             color: #e66797;
+            line-height: 1;
+            font-weight: 700;
         }
 
         .page-title {
-            font-size: 28px;
-            font-weight: normal;
+            font-size: 1.60em;
+            font-weight: 700;
+            text-align: center;
+            margin: 0;
+            grid-column: 2;
         }
 
         .side-menu {
@@ -501,8 +559,22 @@
         }
 
         @media (max-width: 767px) {
+            .floor-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+
+            .map-section {
+                padding: 12px;
+            }
+
+            .map-viewer {
+                height: 280px;
+            }
+
             .page-title {
-                font-size: 24px;
+                font-size: 1.60em;
             }
 
             .search-box {
@@ -534,6 +606,49 @@
 
             .lesson-info {
                 font-size: 16px;
+            }
+        }
+
+        @media (max-width: 425px) {
+            main {
+                padding: 24px 10px 120px;
+            }
+
+            .content-layout {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .floor-section {
+                padding: 0;
+                width: 100%;
+            }
+
+            .floor-buttons {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 10px;
+                width: 100%;
+                padding: 2px 0 0;
+            }
+
+            .map-section {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .map-viewer {
+                width: 100%;
+                height: 260px;
+            }
+
+            .floor-btn {
+                width: calc((100% - 40px) / 5);
+                max-width: 56px;
+                min-width: 48px;
             }
         }
 

@@ -80,10 +80,8 @@ function getBuildingFromRoom(room) {
 }
 
 function getRouteColor(type) {
-  const isHighContrast = document.body.classList.contains("high-contrast");
-
   return {
-    main: isHighContrast ? "#ffffff" : "#111111",
+    main: "#111111",
     accessible: "#1eb06a",
     quiet: "#4f94d3"
   }[type] || "#111111";
@@ -246,7 +244,7 @@ function drawRoute(points, color, opacity, scale, offsetX, offsetY) {
 
   const startPoint = points[0];
   ctx.globalAlpha = 1;
-  ctx.fillStyle = document.body.classList.contains("high-contrast") ? "#ffffff" : "#111111";
+  ctx.fillStyle = "#111111";
   ctx.font = metrics.font;
   ctx.fillText(
     t("routeStartLabel"),
@@ -340,7 +338,7 @@ function renderRoute(routeType = "main") {
 
   currentRouteType = routeType;
   currentRoute = { points, routeType };
-  startLabel.textContent = `[${points[0][0]}, ${points[0][1]}]`;
+  startLabel.textContent = "Roltrap";
   statusChip.textContent = `${selectedRoom} • ${routeType} route`;
   syncRouteButtons(routeType);
   drawCanvas();
@@ -437,7 +435,10 @@ window.onload = function() {
   startRouteBtn.addEventListener("click", () => renderRoute(currentRouteType));
   toggleAltRoutesBtn.addEventListener("click", toggleAlternativeMode);
   arrivedBtn.addEventListener("click", () => arrivalModal.classList.remove("hidden"));
-  closeModalBtn.addEventListener("click", () => arrivalModal.classList.add("hidden"));
+  closeModalBtn.addEventListener("click", () => {
+    arrivalModal.classList.add("hidden");
+    window.location.href = "HomePagina.html";
+  });
   zoomInBtn.addEventListener("click", () => setZoom(zoomLevel * 1.2));
   zoomOutBtn.addEventListener("click", () => setZoom(zoomLevel / 1.2));
   centerBtn.addEventListener("click", resetView);

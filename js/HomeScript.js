@@ -61,7 +61,6 @@ function getPreferredBuildingValue() {
 
     return {
         "Circus": "circus",
-        "De aardbei": "de-aardbei",
         "Landdrost": "landrost"
     }[preferredLocation] || null;
 }
@@ -103,6 +102,8 @@ let mapDragStartX = 0;
 let mapDragStartY = 0;
 let mapStartOffsetX = 0;
 let mapStartOffsetY = 0;
+let pinchStartDistance = 0;
+let pinchStartScale = 1;
 
 function showSearchError(message) {
     searchError.textContent = message;
@@ -208,6 +209,31 @@ function applyMapTransform() {
     mapImage.style.transform = `translate(${mapOffsetX}px, ${mapOffsetY}px) scale(${mapScale})`;
 }
 
+function getDistanceBetweenTouches(touchA, touchB) {
+    const deltaX = touchA.clientX - touchB.clientX;
+    const deltaY = touchA.clientY - touchB.clientY;
+    return Math.hypot(deltaX, deltaY);
+}
+
+function zoomMapToPoint(nextScale, clientX, clientY) {
+    if (!mapViewer || !mapImage.naturalWidth || !mapImage.naturalHeight) {
+        return;
+    }
+
+    const clampedScale = Math.max(0.5, Math.min(4, nextScale));
+    const viewerRect = mapViewer.getBoundingClientRect();
+    const pointerX = clientX - viewerRect.left;
+    const pointerY = clientY - viewerRect.top;
+    const imageX = (pointerX - mapOffsetX) / mapScale;
+    const imageY = (pointerY - mapOffsetY) / mapScale;
+
+    mapScale = clampedScale;
+    mapOffsetX = pointerX - imageX * mapScale;
+    mapOffsetY = pointerY - imageY * mapScale;
+
+    applyMapTransform();
+}
+
 function fitMapToViewer() {
     if (!mapViewer || !mapImage.naturalWidth || !mapImage.naturalHeight) {
         return;
@@ -231,9 +257,12 @@ function resetMapView() {
 }
 
 function zoomMap(step) {
-    const nextScale = Math.max(0.5, Math.min(4, mapScale + step));
-    mapScale = nextScale;
-    applyMapTransform();
+    if (!mapViewer) {
+        return;
+    }
+
+    const viewerRect = mapViewer.getBoundingClientRect();
+    zoomMapToPoint(mapScale + step, viewerRect.left + viewerRect.width / 2, viewerRect.top + viewerRect.height / 2);
 }
 
 function createFloorButtons() {
@@ -292,42 +321,10 @@ resetMapBtn.addEventListener("click", function () {
     resetMapView();
 });
 
-mapViewer.addEventListener("mousedown", function (event) {
-    isMapDragging = true;
-    mapDragStartX = event.clientX;
-    mapDragStartY = event.clientY;
-    mapStartOffsetX = mapOffsetX;
-    mapStartOffsetY = mapOffsetY;
-    mapViewer.classList.add("dragging");
-});
-
-window.addEventListener("mousemove", function (event) {
-    if (!isMapDragging) {
-        return;
-    }
-
-    mapOffsetX = mapStartOffsetX + (event.clientX - mapDragStartX);
-    mapOffsetY = mapStartOffsetY + (event.clientY - mapDragStartY);
-
-    applyMapTransform();
-});
-
-window.addEventListener("mouseup", function () {
-    isMapDragging = false;
-    mapViewer.classList.remove("dragging");
-});
-
-zoomInBtn.addEventListener("click", function () {
-    zoomMap(0.2);
-});
-
-zoomOutBtn.addEventListener("click", function () {
-    zoomMap(-0.2);
-});
-
-resetMapBtn.addEventListener("click", function () {
-    resetMapView();
-});
+mapViewer.addEventListener("wheel", function (event) {
+    event.preventDefault();
+    zoomMapToPoint(mapScale + (event.deltaY < 0 ? 0.15 : -0.15), event.clientX, event.clientY);
+}, { passive: false });
 
 mapViewer.addEventListener("mousedown", function (event) {
     isMapDragging = true;
@@ -338,6 +335,70 @@ mapViewer.addEventListener("mousedown", function (event) {
     mapViewer.classList.add("dragging");
 });
 
+mapViewer.addEventListener("touchstart", function (event) {
+    if (event.touches.length === 1) {
+        const touch = event.touches[0];
+        isMapDragging = true;
+        mapDragStartX = touch.clientX;
+        mapDragStartY = touch.clientY;
+        mapStartOffsetX = mapOffsetX;
+        mapStartOffsetY = mapOffsetY;
+        mapViewer.classList.add("dragging");
+        return;
+    }
+
+    if (event.touches.length === 2) {
+        isMapDragging = false;
+        mapViewer.classList.remove("dragging");
+        pinchStartDistance = getDistanceBetweenTouches(event.touches[0], event.touches[1]);
+        pinchStartScale = mapScale;
+    }
+}, { passive: false });
+
+mapViewer.addEventListener("touchmove", function (event) {
+    if (event.touches.length === 1 && isMapDragging) {
+        event.preventDefault();
+        const touch = event.touches[0];
+        mapOffsetX = mapStartOffsetX + (touch.clientX - mapDragStartX);
+        mapOffsetY = mapStartOffsetY + (touch.clientY - mapDragStartY);
+        applyMapTransform();
+        return;
+    }
+
+    if (event.touches.length === 2) {
+        event.preventDefault();
+        const currentDistance = getDistanceBetweenTouches(event.touches[0], event.touches[1]);
+
+        if (!pinchStartDistance) {
+            pinchStartDistance = currentDistance;
+            pinchStartScale = mapScale;
+        }
+
+        const midpointX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+        const midpointY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+        zoomMapToPoint(pinchStartScale * (currentDistance / pinchStartDistance), midpointX, midpointY);
+    }
+}, { passive: false });
+
+mapViewer.addEventListener("touchend", function (event) {
+    if (event.touches.length === 0) {
+        isMapDragging = false;
+        pinchStartDistance = 0;
+        mapViewer.classList.remove("dragging");
+        return;
+    }
+
+    if (event.touches.length === 1) {
+        const touch = event.touches[0];
+        isMapDragging = true;
+        mapDragStartX = touch.clientX;
+        mapDragStartY = touch.clientY;
+        mapStartOffsetX = mapOffsetX;
+        mapStartOffsetY = mapOffsetY;
+        pinchStartDistance = 0;
+    }
+});
+
 window.addEventListener("mousemove", function (event) {
     if (!isMapDragging) {
         return;
@@ -345,7 +406,6 @@ window.addEventListener("mousemove", function (event) {
 
     mapOffsetX = mapStartOffsetX + (event.clientX - mapDragStartX);
     mapOffsetY = mapStartOffsetY + (event.clientY - mapDragStartY);
-
     applyMapTransform();
 });
 
@@ -517,7 +577,7 @@ function splitRooms(roomValue) {
     }
 
     return roomValue
-        .split(/[;,]/)
+        .split(";")
         .map(function (room) {
             return room.trim();
         })
