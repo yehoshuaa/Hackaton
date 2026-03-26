@@ -20,7 +20,7 @@ const DUTCH_MONTH_NAMES = [
 const hamburgerBtn = document.getElementById("hamburgerBtn");
 const sideMenu = document.getElementById("sideMenu");
 const overlay = document.getElementById("overlay");
-const floorButtons = document.querySelectorAll(".floor-btn");
+const floorButtonsContainer = document.getElementById("floorButtons");
 const mapImage = document.getElementById("mapImage");
 const mapTab = document.getElementById("mapTab");
 const roosterTab = document.getElementById("roosterTab");
@@ -34,12 +34,93 @@ const closeModalBtn = document.getElementById("closeModalBtn");
 const cancelModalBtn = document.getElementById("cancelModalBtn");
 const header = document.querySelector("header");
 const main = document.querySelector("main");
-const buildingFloorImages = {
+const buildingImageSets = {
     circus: {
-        1: "assets/circus-1.png",
-        2: "assets/circus-2.png"
+        prefix: "circus-",
+        numbers: [1, 2]
+    },
+    landrost: {
+        prefix: "AL-",
+        numbers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
 };
+
+
+
+
+function getSelectedBuildingConfig() {
+    return buildingImageSets[buildingSelect.value] || { prefix: "", numbers: [] };
+}
+
+function getActiveImageNumber() {
+    const activeButton = floorButtonsContainer.querySelector(".floor-btn.active");
+
+    if (!activeButton) {
+        return null;
+    }
+
+    return activeButton.dataset.imageNumber;
+}
+
+function updateMapImage() {
+    const selectedBuilding = buildingSelect.value;
+    const buildingConfig = getSelectedBuildingConfig();
+    const activeImageNumber = getActiveImageNumber();
+
+    if (!buildingConfig.prefix || activeImageNumber === null) {
+        mapImage.removeAttribute("src");
+        mapImage.alt = `Geen plattegrond beschikbaar voor ${selectedBuilding}`;
+        return;
+    }
+
+    const imagePath = `assets/${buildingConfig.prefix}${activeImageNumber}.png`;
+
+    mapImage.src = imagePath;
+    mapImage.alt = `Plattegrond ${selectedBuilding} afbeelding ${activeImageNumber}`;
+}
+
+function createFloorButtons() {
+    const buildingConfig = getSelectedBuildingConfig();
+
+    floorButtonsContainer.innerHTML = "";
+
+    if (!buildingConfig.numbers.length) {
+        const emptyMessage = document.createElement("div");
+        emptyMessage.classList.add("no-floor-buttons");
+        emptyMessage.textContent = "Geen afbeeldingen";
+        floorButtonsContainer.appendChild(emptyMessage);
+
+        mapImage.removeAttribute("src");
+        mapImage.alt = `Geen plattegrond beschikbaar voor ${buildingSelect.value}`;
+        return;
+    }
+
+    buildingConfig.numbers.forEach(function (number, index) {
+        const button = document.createElement("button");
+        button.classList.add("floor-btn");
+        button.dataset.imageNumber = number;
+        button.textContent = number;
+
+        if (index === 0) {
+            button.classList.add("active");
+        }
+
+        button.addEventListener("click", function () {
+            const allButtons = floorButtonsContainer.querySelectorAll(".floor-btn");
+
+            allButtons.forEach(function (btn) {
+                btn.classList.remove("active");
+            });
+
+            button.classList.add("active");
+            updateMapImage();
+        });
+
+        floorButtonsContainer.appendChild(button);
+    });
+
+    updateMapImage();
+}
 
 hamburgerBtn.addEventListener("click", function () {
     sideMenu.classList.toggle("open");
@@ -51,33 +132,9 @@ overlay.addEventListener("click", function () {
     overlay.classList.remove("show");
 });
 
-function updateMapImage() {
-    const activeFloorButton = document.querySelector(".floor-btn.active");
-    const selectedBuilding = buildingSelect.value;
-    const selectedFloor = activeFloorButton ? activeFloorButton.dataset.floor : "1";
-    const buildingImages = buildingFloorImages[selectedBuilding] || {};
-    const imagePath = buildingImages[selectedFloor];
 
-    if (!imagePath) {
-        mapImage.removeAttribute("src");
-        mapImage.alt = `Geen plattegrond beschikbaar voor ${selectedBuilding} verdieping ${selectedFloor}`;
-        return;
-    }
 
-    mapImage.src = imagePath;
-    mapImage.alt = `Plattegrond ${selectedBuilding} verdieping ${selectedFloor}`;
-}
 
-floorButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-        floorButtons.forEach(function (btn) {
-            btn.classList.remove("active");
-        });
-
-        button.classList.add("active");
-        updateMapImage();
-    });
-});
 
 mapTab.addEventListener("click", function () {
     mapTab.classList.add("active");
@@ -96,8 +153,7 @@ roosterTab.addEventListener("click", function () {
 });
 
 buildingSelect.addEventListener("change", function () {
-    console.log("Geselecteerd gebouw:", buildingSelect.value);
-    updateMapImage();
+    createFloorButtons();
 });
 
 function openModal() {
@@ -351,6 +407,8 @@ function renderRooster(dayBlocks) {
     });
 }
 
+
+
 async function loadRooster() {
     renderScheduleMessage("Rooster laden...");
 
@@ -432,4 +490,4 @@ modalOverlay.addEventListener("click", function (event) {
 });
 
 loadRooster();
-updateMapImage();
+createFloorButtons();
