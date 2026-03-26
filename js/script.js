@@ -209,7 +209,7 @@ if (loginForm) {
 
     if (email === "jeremy@windesheim.nl" && password === "Hallo123") {
       sessionStorage.setItem("showStarterGuide", "true");
-      window.location.href = "pages/HomePagina.html";
+      window.location.href = "pages/homepagina.html";
     } else {
       openModal(errorModal);
     }
