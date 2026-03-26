@@ -197,6 +197,8 @@ mapTab.addEventListener("click", function () {
 
     mapContent.classList.remove("hide");
     roosterContent.classList.remove("show");
+
+    buildingSelect.style.display = "block";
 });
 
 roosterTab.addEventListener("click", function () {
@@ -205,6 +207,7 @@ roosterTab.addEventListener("click", function () {
 
     mapContent.classList.add("hide");
     roosterContent.classList.add("show");
+    buildingSelect.style.display = "none";
 });
 
 buildingSelect.addEventListener("change", function () {
