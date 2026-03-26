@@ -31,11 +31,11 @@ const roosterContent = document.getElementById("roosterContent");
 const buildingSelect = document.getElementById("buildingSelect");
 const scheduleList = document.getElementById("scheduleList");
 const modalOverlay = document.getElementById("modalOverlay");
+const contentToBlur = [mapContent, roosterContent, document.querySelector(".controls"), document.querySelector(".corner-decoration")];
 const locationButtons = document.getElementById("locationButtons");
+const locationModalCourse = document.getElementById("locationModalCourse");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const cancelModalBtn = document.getElementById("cancelModalBtn");
-const header = document.querySelector("header");
-const main = document.querySelector("main");
 const buildingImageSets = {
     circus: {
         prefix: "circus-",
@@ -213,15 +213,22 @@ buildingSelect.addEventListener("change", function () {
 
 function openModal() {
     modalOverlay.classList.add("show");
-    header.classList.add("blur");
-    main.classList.add("blur");
+    contentToBlur.forEach(function (element) {
+        if (element) {
+            element.classList.add("blur");
+        }
+    });
 }
 
 function closeModal() {
     modalOverlay.classList.remove("show");
-    header.classList.remove("blur");
-    main.classList.remove("blur");
+    contentToBlur.forEach(function (element) {
+        if (element) {
+            element.classList.remove("blur");
+        }
+    });
     locationButtons.innerHTML = "";
+    locationModalCourse.textContent = "📍 Onbekende les";
 }
 
 function pad(value) {
@@ -440,6 +447,8 @@ function renderRooster(dayBlocks) {
                     lessonCard.dataset.lokalen = lesson.rooms.join(",");
                 }
 
+                lessonCard.dataset.lessonTitle = lesson.title;
+
                 let lessonHtml = `<div class="lesson-title">${lesson.title}</div>`;
 
                 if (lesson.room) {
@@ -515,11 +524,13 @@ scheduleList.addEventListener("click", function (event) {
     }
 
     if (lokalen.length === 1) {
-        window.location.href = `klas.html?lokaal=${encodeURIComponent(lokalen[0])}`;
+        window.location.href = `Route.html?room=${encodeURIComponent(lokalen[0])}`;
         return;
     }
 
+    const lessonTitle = lessonCard.dataset.lessonTitle || "Onbekende les";
     locationButtons.innerHTML = "";
+    locationModalCourse.textContent = `📍 ${lessonTitle}`;
 
     lokalen.forEach(function (lokaal) {
         const button = document.createElement("button");
@@ -527,7 +538,7 @@ scheduleList.addEventListener("click", function (event) {
         button.textContent = lokaal;
 
         button.addEventListener("click", function () {
-            window.location.href = `klas.html?lokaal=${encodeURIComponent(lokaal)}`;
+            window.location.href = `Route.html?room=${encodeURIComponent(lokaal)}`;
         });
 
         locationButtons.appendChild(button);
