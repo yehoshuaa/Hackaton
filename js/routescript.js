@@ -80,8 +80,10 @@ function getBuildingFromRoom(room) {
 }
 
 function getRouteColor(type) {
+  const isHighContrast = document.body.classList.contains("high-contrast");
+
   return {
-    main: "#111111",
+    main: isHighContrast ? "#ffffff" : "#111111",
     accessible: "#1eb06a",
     quiet: "#4f94d3"
   }[type] || "#111111";
@@ -109,15 +111,40 @@ const zoomOutBtn = document.getElementById("zoomOutBtn");
 const centerBtn = document.getElementById("centerBtn");
 const arrivalModal = document.getElementById("arrivalModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
-const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
+const routePageMenuBtn = document.getElementById("routePageMenuBtn");
+const routePageMenu = document.getElementById("routePageMenu");
+const routePageOverlay = document.getElementById("routePageOverlay");
+const routePageCloseMenuBtn = document.getElementById("routePageCloseMenuBtn");
 const mobileRouteType = document.getElementById("mobileRouteType");
 const routeTypeButtons = document.querySelectorAll(".route-type-btn");
+const profilePreferences = window.campusProfile ? window.campusProfile.getPreferences() : null;
+
+function t(key, replacements = {}) {
+  if (typeof window.translate === "function") {
+    return window.translate(key, replacements);
+  }
+
+  return key;
+}
+
+function getInitialRouteType() {
+  if (!profilePreferences || !profilePreferences.wheelchairRoute) {
+    return "main";
+  }
+
+  const roomRoutes = floorData.routes[selectedRoom];
+  if (roomRoutes && roomRoutes.accessible && roomRoutes.accessible.length > 0) {
+    return "accessible";
+  }
+
+  return "main";
+}
 
 let canvas;
 let ctx;
 let currentImage = null;
-let currentRouteType = "main";
+let currentRouteType = getInitialRouteType();
 let currentRoute = null;
 let showAlternativeState = false;
 let zoomLevel = 1;
@@ -135,7 +162,7 @@ buildingLabel.textContent = currentBuilding;
 floorLabel.textContent = currentFloor;
 roomLabel.textContent = selectedRoom;
 pageTitle.textContent = selectedRoom;
-modalRoomText.textContent = `Lokaal ${selectedRoom}`;
+modalRoomText.textContent = t("routeRoomLabel", { room: selectedRoom });
 modalCourseText.textContent = selectedCourse;
 
 function getCanvasWrapperSize() {
@@ -219,10 +246,10 @@ function drawRoute(points, color, opacity, scale, offsetX, offsetY) {
 
   const startPoint = points[0];
   ctx.globalAlpha = 1;
-  ctx.fillStyle = "#111111";
+  ctx.fillStyle = document.body.classList.contains("high-contrast") ? "#ffffff" : "#111111";
   ctx.font = metrics.font;
   ctx.fillText(
-    "Start",
+    t("routeStartLabel"),
     startPoint[0] * scale + offsetX + metrics.labelOffsetX,
     startPoint[1] * scale + offsetY - metrics.labelOffsetY
   );
@@ -296,8 +323,8 @@ function renderRoute(routeType = "main") {
 
   if (!roomRoutes) {
     currentRoute = null;
-    startLabel.textContent = "Geen route";
-    statusChip.textContent = `Geen routegegevens gevonden voor ${selectedRoom}`;
+    startLabel.textContent = t("routeNoRoute");
+    statusChip.textContent = t("routeNoDataForRoom", { room: selectedRoom });
     drawCanvas();
     return;
   }
@@ -305,8 +332,8 @@ function renderRoute(routeType = "main") {
   const points = roomRoutes[routeType];
   if (!points || points.length === 0) {
     currentRoute = null;
-    startLabel.textContent = "Geen route";
-    statusChip.textContent = `Geen ${routeType}-route gevonden voor ${selectedRoom}`;
+    startLabel.textContent = t("routeNoRoute");
+    statusChip.textContent = t("routeNoTypeForRoom", { type: routeType, room: selectedRoom });
     drawCanvas();
     return;
   }
@@ -385,6 +412,16 @@ function toggleAlternativeMode() {
   renderRoute("main");
 }
 
+function openRoutePageMenu() {
+  routePageMenu.classList.add("open");
+  routePageOverlay.classList.add("show");
+}
+
+function closeRoutePageMenu() {
+  routePageMenu.classList.remove("open");
+  routePageOverlay.classList.remove("show");
+}
+
 window.onload = function() {
   canvas = document.getElementById("mapCanvas");
   ctx = canvas.getContext("2d");
@@ -419,13 +456,20 @@ window.onload = function() {
     });
   }
 
-  menuBtn.addEventListener("click", () => sidebar.classList.toggle("open"));
+  routePageMenuBtn.addEventListener("click", openRoutePageMenu);
+  routePageCloseMenuBtn.addEventListener("click", closeRoutePageMenu);
+  routePageOverlay.addEventListener("click", closeRoutePageMenu);
 
   window.addEventListener("click", (event) => {
-    const clickedMenu = event.target.closest("#menuBtn");
+    const clickedRoutePageMenu = event.target.closest("#routePageMenu");
+    const clickedRoutePageMenuBtn = event.target.closest("#routePageMenuBtn");
     const clickedSidebar = event.target.closest("#sidebar");
 
-    if (window.innerWidth <= 980 && !clickedMenu && !clickedSidebar) {
+    if (!clickedRoutePageMenu && !clickedRoutePageMenuBtn && event.target !== routePageOverlay) {
+      closeRoutePageMenu();
+    }
+
+    if (window.innerWidth <= 980 && !clickedSidebar) {
       sidebar.classList.remove("open");
     }
   });

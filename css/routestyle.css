@@ -29,8 +29,164 @@ html, body {
   color: var(--text);
 }
 
-body { overflow: hidden; }
+body.large-text h1,
+body.large-text h2,
+body.large-text h3,
+body.large-text p,
+body.large-text span,
+body.large-text button,
+body.large-text label,
+body.large-text select {
+  font-size: 1.08em;
+}
+
+body.high-contrast {
+  background: #000;
+  color: #fff;
+}
+
+body.high-contrast .route-page-menu,
+body.high-contrast .sidebar,
+body.high-contrast .sidebar-card,
+body.high-contrast .main-content,
+body.high-contrast .canvas-wrapper,
+body.high-contrast .status-chip,
+body.high-contrast .modal-card,
+body.high-contrast .mobile-route-switcher select {
+  background: #000 !important;
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+body.high-contrast .canvas-control-btn,
+body.high-contrast .action-btn,
+body.high-contrast .back-btn,
+body.high-contrast .route-type-btn,
+body.high-contrast .route-page-close-menu-btn,
+body.high-contrast .mobile-route-switcher select {
+  background: transparent !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+  box-shadow: none !important;
+}
+
+body.high-contrast .label,
+body.high-contrast .value,
+body.high-contrast .brand h1,
+body.high-contrast .brand p,
+body.high-contrast .legend-card .legend-row span,
+body.high-contrast .page-kicker,
+body.high-contrast .topbar h2,
+body.high-contrast .modal-room,
+body.high-contrast .modal-course,
+body.high-contrast .yippee,
+body.high-contrast .route-page-menu-list a,
+body.high-contrast .route-page-hamburger-btn {
+  color: #fff !important;
+}
+
+body.high-contrast .route-page-menu-top,
+body.high-contrast .route-page-menu-list li {
+  border-color: #fff !important;
+}
+
+body.high-contrast .route-page-menu-list a:hover,
+body.high-contrast .route-type-btn.active,
+body.high-contrast .canvas-control-btn:hover,
+body.high-contrast .action-btn:hover,
+body.high-contrast .back-btn:hover {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+body.high-contrast .legend-line.main {
+  border-color: #fff;
+}
+
+body.high-contrast .legend-dot {
+  background: #fff;
+  border-color: #000;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
 button, select { font: inherit; }
+
+.route-page-menu {
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 280px;
+  max-width: 50%;
+  height: 100vh;
+  background-color: #d97cab;
+  transition: left 0.3s ease;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+}
+
+.route-page-menu.open { left: 0; }
+
+.route-page-menu-top {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 88px;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.route-page-close-menu-btn {
+  background: none;
+  border: none;
+  font-size: 34px;
+  cursor: pointer;
+  color: #111;
+  line-height: 1;
+}
+
+.route-page-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.route-page-menu-list li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.route-page-menu-list a {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: #111;
+  font-size: 20px;
+  font-weight: 700;
+  padding: 18px 12px;
+  transition: background-color 0.2s ease;
+}
+
+.route-page-menu-list a:hover {
+  background-color: #f16682;
+}
+
+.route-page-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1050;
+}
+
+.route-page-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 .app-shell {
   display: grid;
@@ -173,6 +329,15 @@ button, select { font: inherit; }
 }
 
 .topbar-left { display: flex; align-items: center; gap: 14px; }
+
+.route-page-hamburger-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #e66797;
+  line-height: 1;
+}
 
 .back-btn {
   width: 44px;
@@ -337,6 +502,7 @@ button, select { font: inherit; }
 @media (max-width: 980px) {
   body { overflow: auto; }
   .app-shell { grid-template-columns: 1fr; }
+  .route-page-menu { max-width: 88vw; }
   
   .sidebar {
     position: fixed;
@@ -358,6 +524,7 @@ button, select { font: inherit; }
 }
 
 @media (max-width: 640px) {
+  .route-page-menu { width: min(280px, 88vw); }
   .topbar-right { width: 100%; justify-content: flex-end; }
   .actions { flex-direction: column; }
   .action-btn { width: 100%; }

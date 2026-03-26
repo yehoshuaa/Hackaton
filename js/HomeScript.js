@@ -3,6 +3,7 @@ const searchError = document.getElementById("searchError");
 const ROOSTER_API_URL = "https://ical.windesheim.nl/api/Rooster-v10?culture=en&key=a77430f8-e6c3-4127-9864-ec966b839427";
 const ROOSTER_PROXY_URL = `https://cors.utilitytool.app/${ROOSTER_API_URL}`;
 const DAYS_TO_SHOW = 7;
+const initialTab = new URLSearchParams(window.location.search).get("tab");
 const DUTCH_DAY_NAMES = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
 const DUTCH_MONTH_NAMES = [
     "januari",
@@ -47,6 +48,20 @@ const buildingImageSets = {
     }
 };
 
+function getPreferredBuildingValue() {
+    if (!window.campusProfile) {
+        return null;
+    }
+
+    const preferredLocation = window.campusProfile.getPreferences().preferredLocation;
+
+    return {
+        "Circus": "circus",
+        "De aardbei": "de-aardbei",
+        "Landdrost": "landrost"
+    }[preferredLocation] || null;
+}
+
 const validRooms = [
     "AC1.18",
     "AC1.20",
@@ -56,6 +71,14 @@ const validRooms = [
     "AC1.28",
     "AC1.30"
 ];
+
+function t(key, replacements = {}) {
+    if (typeof window.translate === "function") {
+        return window.translate(key, replacements);
+    }
+
+    return key;
+}
 
 function normalizeRoomInput(input) {
     if (!input) {
@@ -80,12 +103,12 @@ function handleRoomSearch() {
     const normalizedRoom = normalizeRoomInput(searchBox.value);
 
     if (!normalizedRoom) {
-        showSearchError("Voer een lokaal in");
+        showSearchError(t("homeSearchEmpty"));
         return;
     }
 
     if (!validRooms.includes(normalizedRoom)) {
-        showSearchError("Dit lokaal bestaat niet");
+        showSearchError(t("homeSearchInvalid"));
         return;
     }
 
@@ -124,7 +147,7 @@ function updateMapImage() {
 
     if (!buildingConfig.prefix || activeImageNumber === null) {
         mapImage.removeAttribute("src");
-        mapImage.alt = `Geen plattegrond beschikbaar voor ${selectedBuilding}`;
+        mapImage.alt = t("homeNoMapAvailable", { building: selectedBuilding });
         return;
     }
 
@@ -142,11 +165,11 @@ function createFloorButtons() {
     if (!buildingConfig.numbers.length) {
         const emptyMessage = document.createElement("div");
         emptyMessage.classList.add("no-floor-buttons");
-        emptyMessage.textContent = "Geen afbeeldingen";
+        emptyMessage.textContent = t("homeNoImages");
         floorButtonsContainer.appendChild(emptyMessage);
 
         mapImage.removeAttribute("src");
-        mapImage.alt = `Geen plattegrond beschikbaar voor ${buildingSelect.value}`;
+        mapImage.alt = t("homeNoMapAvailable", { building: buildingSelect.value });
         return;
     }
 
@@ -187,25 +210,24 @@ overlay.addEventListener("click", function () {
     overlay.classList.remove("show");
 });
 
-
-
-
-
-mapTab.addEventListener("click", function () {
+function showMapTab() {
     mapTab.classList.add("active");
     roosterTab.classList.remove("active");
 
     mapContent.classList.remove("hide");
     roosterContent.classList.remove("show");
-});
+}
 
-roosterTab.addEventListener("click", function () {
+function showRoosterTab() {
     roosterTab.classList.add("active");
     mapTab.classList.remove("active");
 
     mapContent.classList.add("hide");
     roosterContent.classList.add("show");
-});
+}
+
+mapTab.addEventListener("click", showMapTab);
+roosterTab.addEventListener("click", showRoosterTab);
 
 buildingSelect.addEventListener("change", function () {
     createFloorButtons();
@@ -363,7 +385,7 @@ function mapEventToLesson(event) {
         dateKey: getLocalDateKey(start),
         start: start,
         time: `${formatTime(start)}\n${formatTime(end)}`,
-        title: decodeIcsText(event.SUMMARY || "Onbekende les").replace(/\s+,.*$/, "").trim(),
+        title: decodeIcsText(event.SUMMARY || t("homeUnknownLesson")).replace(/\s+,.*$/, "").trim(),
         room: room,
         rooms: rooms,
         teacher: extractTeacher(event.DESCRIPTION),
@@ -425,7 +447,7 @@ function renderRooster(dayBlocks) {
         if (dayBlock.lessons.length === 0) {
             const emptyDay = document.createElement("div");
             emptyDay.classList.add("empty-day");
-            emptyDay.textContent = "Geen lessen gepland";
+            emptyDay.textContent = t("homeNoLessonsPlanned");
             dayGroup.appendChild(emptyDay);
         } else {
             dayBlock.lessons.forEach(function (lesson) {
@@ -474,7 +496,7 @@ function renderRooster(dayBlocks) {
 
 
 async function loadRooster() {
-    renderScheduleMessage("Rooster laden...");
+    renderScheduleMessage(t("homeLoadingSchedule"));
 
     try {
         let response;
@@ -501,7 +523,7 @@ async function loadRooster() {
         renderRooster(createDayBlocks(lessons));
     } catch (error) {
         console.error(error);
-        renderScheduleMessage("Het rooster kon niet worden geladen.");
+        renderScheduleMessage(t("homeScheduleLoadError"));
     }
 }
 
@@ -556,4 +578,16 @@ modalOverlay.addEventListener("click", function (event) {
 });
 
 loadRooster();
+
+const preferredBuildingValue = getPreferredBuildingValue();
+if (preferredBuildingValue && buildingSelect.querySelector(`option[value="${preferredBuildingValue}"]`)) {
+    buildingSelect.value = preferredBuildingValue;
+}
+
 createFloorButtons();
+
+if (initialTab === "rooster") {
+    showRoosterTab();
+} else {
+    showMapTab();
+}

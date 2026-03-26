@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Plattegrond</title>
+    <title data-translate="homeHeaderTitle">Home</title>
     <link rel="stylesheet" href="../css/HomeStyle.css">
 </head>
 <body>
@@ -14,35 +14,35 @@
             <button class="close-menu-btn" id="closeMenuBtn" aria-label="Sluit menu">×</button>
         </div>
 
-        <ul class="menu-list">
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Plattegrond</a></li>
-            <li><a href="#">Rooster</a></li>
-            <li><a href="#">Profiel</a></li>
-        </ul>
+    <ul class="menu-list">
+      <li><a href="HomePagina.html" data-translate="homeMenuHome">Home</a></li>
+      <li><a href="HomePagina.html?tab=map" data-translate="homeMenuMap">Plattegrond</a></li>
+      <li><a href="HomePagina.html?tab=rooster" data-translate="homeMenuSchedule">Rooster</a></li>
+      <li><a href="profile.html" data-translate="homeMenuProfile">Profiel</a></li>
+    </ul>
     </nav>
 
     <header>
         <div class="header-inner">
             <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">☰</button>
-            <h1 class="page-title">Home</h1>
+            <h1 class="page-title" data-translate="homeHeaderTitle">Home</h1>
         </div>
     </header>
 
     <main>
         <section class="controls">
-            <input type="text" class="search-box" id="searchBox" placeholder="Zoeken...">
+            <input type="text" class="search-box" id="searchBox" data-translate-placeholder="homeSearchPlaceholder" placeholder="Zoeken...">
             <div class="search-error" id="searchError"></div>
 
             <div class="tab-row">
-                <button class="tab-btn active" id="mapTab">Map</button>
-                <button class="tab-btn" id="roosterTab">Rooster</button>
+                <button class="tab-btn active" id="mapTab" data-translate="homeMapTab">Map</button>
+                <button class="tab-btn" id="roosterTab" data-translate="homeScheduleTab">Rooster</button>
             </div>
 
             <select class="building-select" id="buildingSelect">
-                <option value="circus">Circus</option>
-                <option value="landrost">Landrost</option>
-                <option value="de-aardbei">De Aardbei</option>
+                <option value="circus" data-translate="homeBuildingCircus">Circus</option>
+                <option value="landrost" data-translate="homeBuildingLandrost">Landrost</option>
+                <option value="de-aardbei" data-translate="homeBuildingAardbei">De Aardbei</option>
             </select>
         </section>
 
@@ -75,15 +75,18 @@
         <div class="modal-overlay" id="modalOverlay">
             <div class="location-modal" id="locationModal">
                 <button class="close-modal-btn" id="closeModalBtn" aria-label="Sluiten">×</button>
-                <h2>Kies je lokaal</h2>
-                <p class="location-modal-label">Je volgende les:</p>
+                <h2 data-translate="locationModalTitle">Kies je lokaal</h2>
+                <p class="location-modal-label" data-translate="locationModalLabel">Je volgende les:</p>
                 <p class="location-modal-course" id="locationModalCourse">📍 Onbekende les</p>
                 <div class="location-buttons" id="locationButtons"></div>
-                <button class="cancel-btn" id="cancelModalBtn">Annuleren</button>
+                <button class="cancel-btn" id="cancelModalBtn" data-translate="cancelBtn">Annuleren</button>
             </div>
         </div>
 
     </main>
+    <script src="../js/language.js"></script>
+    <script src="../js/profile-preferences.js"></script>
     <script src="../js/HomeScript.js"></script>
+    <script src="../js/lesson-notifications.js"></script>
 </body>
 </html>

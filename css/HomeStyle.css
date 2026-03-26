@@ -10,6 +10,74 @@
             color: #222;
         }
 
+        body.large-text h1,
+        body.large-text h2,
+        body.large-text h3,
+        body.large-text p,
+        body.large-text span,
+        body.large-text button,
+        body.large-text label,
+        body.large-text input,
+        body.large-text select {
+            font-size: 1.08em;
+        }
+
+        body.high-contrast {
+            background: #000;
+            color: #fff;
+        }
+
+        body.high-contrast header,
+        body.high-contrast main,
+        body.high-contrast .side-menu,
+        body.high-contrast .lesson-card,
+        body.high-contrast .location-modal,
+        body.high-contrast .search-box,
+        body.high-contrast .building-select,
+        body.high-contrast .tab-btn,
+        body.high-contrast .dropdown,
+        body.high-contrast .modal-overlay {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        body.high-contrast .menu-list a,
+        body.high-contrast .page-title,
+        body.high-contrast .lesson-info,
+        body.high-contrast .lesson-title,
+        body.high-contrast .location-option-btn,
+        body.high-contrast .cancel-btn,
+        body.high-contrast .hamburger-btn,
+        body.high-contrast .close-menu-btn {
+            color: #fff !important;
+        }
+
+        body.high-contrast .tab-btn,
+        body.high-contrast .location-option-btn,
+        body.high-contrast .cancel-btn,
+        body.high-contrast .search-box,
+        body.high-contrast .building-select,
+        body.high-contrast .hamburger-btn,
+        body.high-contrast .close-menu-btn {
+            background: transparent !important;
+            border: 2px solid #fff !important;
+            box-shadow: none !important;
+        }
+
+        body.high-contrast .menu-top,
+        body.high-contrast .menu-list li {
+            border-color: #fff !important;
+        }
+
+        body.high-contrast .menu-list a:hover,
+        body.high-contrast .tab-btn.active,
+        body.high-contrast .location-option-btn:hover,
+        body.high-contrast .cancel-btn:hover {
+            background: #fff !important;
+            color: #000 !important;
+        }
+
         header {
             border-bottom: 1px solid #dddddd00;
             padding: 16px 20px;

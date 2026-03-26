@@ -11,6 +11,49 @@ body {
     overflow-x: hidden;
 }
 
+body.large-text h1,
+body.large-text h2,
+body.large-text h3,
+body.large-text p,
+body.large-text span,
+body.large-text button,
+body.large-text label,
+body.large-text input,
+body.large-text select {
+    font-size: 1.1em;
+}
+
+body.high-contrast {
+    background: #000;
+    color: #fff;
+}
+
+body.high-contrast .top-area,
+body.high-contrast .logout,
+body.high-contrast .popup-content,
+body.high-contrast .dropdown {
+    background: #000;
+    color: #fff;
+}
+
+body.high-contrast .row,
+body.high-contrast .profile-card,
+body.high-contrast .dropdown-item,
+body.high-contrast .popup-content input,
+body.high-contrast .language-select {
+    border-color: #fff;
+    color: #fff;
+}
+
+body.high-contrast .back-btn,
+body.high-contrast .profile-info p,
+body.high-contrast .top-area h1,
+body.high-contrast .link-btn,
+body.high-contrast .dropdown-item,
+body.high-contrast span {
+    color: #fff;
+}
+
 span {
     font-size: 14px;
 }
@@ -113,6 +156,18 @@ linear-gradient(210deg, var(--rood) 100%);
 
 .row-link {
     cursor: pointer;
+}
+
+.language-row {
+    gap: 16px;
+}
+
+.language-select {
+    min-width: 72px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--grijs2);
+    background: rgba(255, 255, 255, 0.92);
 }
 
 
