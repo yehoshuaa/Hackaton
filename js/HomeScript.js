@@ -37,6 +37,10 @@ const locationButtons = document.getElementById("locationButtons");
 const locationModalCourse = document.getElementById("locationModalCourse");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const cancelModalBtn = document.getElementById("cancelModalBtn");
+const mapViewer = document.getElementById("mapViewer");
+const zoomInBtn = document.getElementById("zoomInBtn");
+const zoomOutBtn = document.getElementById("zoomOutBtn");
+const resetMapBtn = document.getElementById("resetMapBtn");
 const buildingImageSets = {
     circus: {
         prefix: "circus-",
@@ -90,6 +94,15 @@ function normalizeRoomInput(input) {
         .toUpperCase()
         .replace(/\s+/g, "");
 }
+
+let mapScale = 1;
+let mapOffsetX = 0;
+let mapOffsetY = 0;
+let isMapDragging = false;
+let mapDragStartX = 0;
+let mapDragStartY = 0;
+let mapStartOffsetX = 0;
+let mapStartOffsetY = 0;
 
 function showSearchError(message) {
     searchError.textContent = message;
@@ -153,8 +166,74 @@ function updateMapImage() {
 
     const imagePath = `assets/${buildingConfig.prefix}${activeImageNumber}.png`;
 
+    mapImage.onload = function () {
+        resetMapView();
+    };
+
     mapImage.src = imagePath;
     mapImage.alt = `Plattegrond ${selectedBuilding} afbeelding ${activeImageNumber}`;
+}
+
+function clampMapOffsets() {
+    if (!mapViewer || !mapImage.complete) {
+        return;
+    }
+
+    const viewerWidth = mapViewer.clientWidth;
+    const viewerHeight = mapViewer.clientHeight;
+
+    const scaledWidth = mapImage.naturalWidth * mapScale;
+    const scaledHeight = mapImage.naturalHeight * mapScale;
+
+    let minX = viewerWidth - scaledWidth;
+    let minY = viewerHeight - scaledHeight;
+
+    if (scaledWidth <= viewerWidth) {
+        minX = (viewerWidth - scaledWidth) / 2;
+        mapOffsetX = minX;
+    } else {
+        mapOffsetX = Math.min(0, Math.max(minX, mapOffsetX));
+    }
+
+    if (scaledHeight <= viewerHeight) {
+        minY = (viewerHeight - scaledHeight) / 2;
+        mapOffsetY = minY;
+    } else {
+        mapOffsetY = Math.min(0, Math.max(minY, mapOffsetY));
+    }
+}
+
+function applyMapTransform() {
+    clampMapOffsets();
+    mapImage.style.transform = `translate(${mapOffsetX}px, ${mapOffsetY}px) scale(${mapScale})`;
+}
+
+function fitMapToViewer() {
+    if (!mapViewer || !mapImage.naturalWidth || !mapImage.naturalHeight) {
+        return;
+    }
+
+    const viewerWidth = mapViewer.clientWidth;
+    const viewerHeight = mapViewer.clientHeight;
+
+    const scaleX = viewerWidth / mapImage.naturalWidth;
+    const scaleY = viewerHeight / mapImage.naturalHeight;
+
+    mapScale = Math.max(scaleX, scaleY);
+    mapOffsetX = 0;
+    mapOffsetY = 0;
+
+    applyMapTransform();
+}
+
+function resetMapView() {
+    fitMapToViewer();
+}
+
+function zoomMap(step) {
+    const nextScale = Math.max(0.5, Math.min(4, mapScale + step));
+    mapScale = nextScale;
+    applyMapTransform();
 }
 
 function createFloorButtons() {
@@ -199,6 +278,81 @@ function createFloorButtons() {
 
     updateMapImage();
 }
+
+
+zoomInBtn.addEventListener("click", function () {
+    zoomMap(0.2);
+});
+
+zoomOutBtn.addEventListener("click", function () {
+    zoomMap(-0.2);
+});
+
+resetMapBtn.addEventListener("click", function () {
+    resetMapView();
+});
+
+mapViewer.addEventListener("mousedown", function (event) {
+    isMapDragging = true;
+    mapDragStartX = event.clientX;
+    mapDragStartY = event.clientY;
+    mapStartOffsetX = mapOffsetX;
+    mapStartOffsetY = mapOffsetY;
+    mapViewer.classList.add("dragging");
+});
+
+window.addEventListener("mousemove", function (event) {
+    if (!isMapDragging) {
+        return;
+    }
+
+    mapOffsetX = mapStartOffsetX + (event.clientX - mapDragStartX);
+    mapOffsetY = mapStartOffsetY + (event.clientY - mapDragStartY);
+
+    applyMapTransform();
+});
+
+window.addEventListener("mouseup", function () {
+    isMapDragging = false;
+    mapViewer.classList.remove("dragging");
+});
+
+zoomInBtn.addEventListener("click", function () {
+    zoomMap(0.2);
+});
+
+zoomOutBtn.addEventListener("click", function () {
+    zoomMap(-0.2);
+});
+
+resetMapBtn.addEventListener("click", function () {
+    resetMapView();
+});
+
+mapViewer.addEventListener("mousedown", function (event) {
+    isMapDragging = true;
+    mapDragStartX = event.clientX;
+    mapDragStartY = event.clientY;
+    mapStartOffsetX = mapOffsetX;
+    mapStartOffsetY = mapOffsetY;
+    mapViewer.classList.add("dragging");
+});
+
+window.addEventListener("mousemove", function (event) {
+    if (!isMapDragging) {
+        return;
+    }
+
+    mapOffsetX = mapStartOffsetX + (event.clientX - mapDragStartX);
+    mapOffsetY = mapStartOffsetY + (event.clientY - mapDragStartY);
+
+    applyMapTransform();
+});
+
+window.addEventListener("mouseup", function () {
+    isMapDragging = false;
+    mapViewer.classList.remove("dragging");
+});
 
 hamburgerBtn.addEventListener("click", function () {
     sideMenu.classList.toggle("open");
@@ -568,6 +722,8 @@ scheduleList.addEventListener("click", function (event) {
 
     openModal();
 });
+
+
 
 closeModalBtn.addEventListener("click", closeModal);
 cancelModalBtn.addEventListener("click", closeModal);
