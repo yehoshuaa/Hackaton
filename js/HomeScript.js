@@ -37,6 +37,10 @@ const locationButtons = document.getElementById("locationButtons");
 const locationModalCourse = document.getElementById("locationModalCourse");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const cancelModalBtn = document.getElementById("cancelModalBtn");
+const starterGuideOverlay = document.getElementById("starterGuideOverlay");
+const starterGuideCloseBtn = document.getElementById("starterGuideCloseBtn");
+const starterGuideSkipBtn = document.getElementById("starterGuideSkipBtn");
+const starterGuideRoosterBtn = document.getElementById("starterGuideRoosterBtn");
 const mapViewer = document.getElementById("mapViewer");
 const zoomInBtn = document.getElementById("zoomInBtn");
 const zoomOutBtn = document.getElementById("zoomOutBtn");
@@ -443,6 +447,29 @@ function showRoosterTab() {
 mapTab.addEventListener("click", showMapTab);
 roosterTab.addEventListener("click", showRoosterTab);
 
+if (starterGuideCloseBtn) {
+    starterGuideCloseBtn.addEventListener("click", closeStarterGuide);
+}
+
+if (starterGuideSkipBtn) {
+    starterGuideSkipBtn.addEventListener("click", closeStarterGuide);
+}
+
+if (starterGuideRoosterBtn) {
+    starterGuideRoosterBtn.addEventListener("click", function () {
+        closeStarterGuide();
+        showRoosterTab();
+    });
+}
+
+if (starterGuideOverlay) {
+    starterGuideOverlay.addEventListener("click", function (event) {
+        if (event.target === starterGuideOverlay) {
+            closeStarterGuide();
+        }
+    });
+}
+
 buildingSelect.addEventListener("change", function () {
     createFloorButtons();
 });
@@ -465,6 +492,18 @@ function closeModal() {
     });
     locationButtons.innerHTML = "";
     locationModalCourse.textContent = "📍 Onbekende les";
+}
+
+function openStarterGuide() {
+    if (starterGuideOverlay) {
+        starterGuideOverlay.classList.add("show");
+    }
+}
+
+function closeStarterGuide() {
+    if (starterGuideOverlay) {
+        starterGuideOverlay.classList.remove("show");
+    }
 }
 
 function pad(value) {
@@ -806,4 +845,9 @@ if (initialTab === "rooster") {
     showRoosterTab();
 } else {
     showMapTab();
+}
+
+if (sessionStorage.getItem("showStarterGuide") === "true") {
+    sessionStorage.removeItem("showStarterGuide");
+    openStarterGuide();
 }

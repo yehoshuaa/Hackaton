@@ -43,6 +43,11 @@ const translations = {
     locationModalLabel: "Je volgende les:",
     locationModalUnknown: "Onbekende les",
     cancelBtn: "Annuleren",
+    starterGuideKicker: "Starter guide",
+    starterGuideTitle: "Bekijk je route direct vanuit je rooster",
+    starterGuideText: "Klik op een les in het rooster en kies daarna je lokaal. Dan openen we meteen de route voor je.",
+    starterGuideOpenSchedule: "Open rooster",
+    starterGuideLater: "Later",
 
     profileTitle: "Profiel",
     profileChangePassword: "Wachtwoord veranderen",
@@ -155,6 +160,11 @@ const translations = {
     locationModalLabel: "Your next class:",
     locationModalUnknown: "Unknown class",
     cancelBtn: "Cancel",
+    starterGuideKicker: "Starter guide",
+    starterGuideTitle: "Open your route directly from your schedule",
+    starterGuideText: "Click a class in the schedule and then choose your room. We will open the route for you right away.",
+    starterGuideOpenSchedule: "Open schedule",
+    starterGuideLater: "Later",
 
     profileTitle: "Profile",
     profileChangePassword: "Change password",
