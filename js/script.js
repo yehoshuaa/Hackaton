@@ -266,16 +266,11 @@ if (loginForm) {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    // Demo mode: geen credentials verplicht, altijd inloggen als leeg
-    if ((email === "" && password === "") ||
-        (email === "jeremy@windesheim.nl" && password === "Hallo123") ||
-        (email === "s1183889@student.windesheim.nl" && password === "@Emily2009")) {
-      sessionStorage.setItem("showStarterGuide", "true");
-      window.location.href = "pages/HomePagina.html";
-      return;
-    }
+    console.log("Login attempt", { email, password });
 
-    openModal(errorModal);
+    // 100% demo gedrag: altijd inloggen, zonder foutmelding.
+    sessionStorage.setItem("showStarterGuide", "true");
+    window.location.href = "pages/HomePagina.html";
   });
 }
 
