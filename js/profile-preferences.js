@@ -34,19 +34,34 @@ function readCampusProfilePreferences() {
   try {
     const saved = localStorage.getItem(CAMPUS_PROFILE_STORAGE_KEY);
     if (!saved) {
-      return { ...CAMPUS_PROFILE_DEFAULTS };
+      return {
+        ...CAMPUS_PROFILE_DEFAULTS,
+        largeText: localStorage.getItem("largeText") === "true",
+        highContrast: localStorage.getItem("highContrast") === "true",
+        wheelchairRoute: localStorage.getItem("wheelchairRoute") === "true",
+        language: localStorage.getItem("selectedLanguage") || CAMPUS_PROFILE_DEFAULTS.language
+      };
     }
 
     const parsed = JSON.parse(saved);
     return {
       ...CAMPUS_PROFILE_DEFAULTS,
       ...parsed,
+      largeText: parsed.largeText !== undefined ? parsed.largeText : localStorage.getItem("largeText") === "true",
+      highContrast: parsed.highContrast !== undefined ? parsed.highContrast : localStorage.getItem("highContrast") === "true",
+      wheelchairRoute: parsed.wheelchairRoute !== undefined ? parsed.wheelchairRoute : localStorage.getItem("wheelchairRoute") === "true",
       preferredLocation: normalizePreferredLocation(parsed.preferredLocation),
       language: parsed.language || localStorage.getItem("selectedLanguage") || "nl"
     };
   } catch (error) {
     console.warn("Could not read campus profile preferences.", error);
-    return { ...CAMPUS_PROFILE_DEFAULTS };
+    return {
+      ...CAMPUS_PROFILE_DEFAULTS,
+      largeText: localStorage.getItem("largeText") === "true",
+      highContrast: localStorage.getItem("highContrast") === "true",
+      wheelchairRoute: localStorage.getItem("wheelchairRoute") === "true",
+      language: localStorage.getItem("selectedLanguage") || CAMPUS_PROFILE_DEFAULTS.language
+    };
   }
 }
 

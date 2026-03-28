@@ -33,6 +33,33 @@ function closeModal(modal) {
 }
 
 function applySavedAccessibilitySettings() {
+  let preferences = null;
+
+  if (window.campusProfile && typeof window.campusProfile.getPreferences === "function") {
+    preferences = window.campusProfile.getPreferences();
+  }
+
+  if (preferences) {
+    document.body.classList.toggle("large-text", Boolean(preferences.largeText));
+    document.body.classList.toggle("high-contrast", Boolean(preferences.highContrast));
+
+    if (largeTextToggle) {
+      largeTextToggle.checked = Boolean(preferences.largeText);
+    }
+    if (contrastToggle) {
+      contrastToggle.checked = Boolean(preferences.highContrast);
+    }
+    if (wheelchairToggle) {
+      wheelchairToggle.checked = Boolean(preferences.wheelchairRoute);
+    }
+
+    if (languageSelect) {
+      languageSelect.value = preferences.language || getSavedLanguage();
+    }
+
+    return;
+  }
+
   const savedLargeText = localStorage.getItem("largeText");
   const savedHighContrast = localStorage.getItem("highContrast");
   const savedWheelchair = localStorage.getItem("wheelchairRoute");
@@ -95,28 +122,32 @@ if (accessibilityModal) {
 /* OPSLAAN */
 if (saveBtn) {
   saveBtn.addEventListener("click", () => {
-    if (largeTextToggle && largeTextToggle.checked) {
-      document.body.classList.add("large-text");
-      localStorage.setItem("largeText", "true");
+    const newPreferences = {
+      largeText: largeTextToggle && largeTextToggle.checked,
+      highContrast: contrastToggle && contrastToggle.checked,
+      wheelchairRoute: wheelchairToggle && wheelchairToggle.checked,
+      language: (languageSelect && languageSelect.value) || getSavedLanguage()
+    };
+
+    if (window.campusProfile && typeof window.campusProfile.updatePreferences === "function") {
+      window.campusProfile.updatePreferences(newPreferences);
     } else {
-      document.body.classList.remove("large-text");
-      localStorage.setItem("largeText", "false");
-    }
+      if (newPreferences.largeText) {
+        document.body.classList.add("large-text");
+      } else {
+        document.body.classList.remove("large-text");
+      }
 
-    if (contrastToggle && contrastToggle.checked) {
-      document.body.classList.add("high-contrast");
-      localStorage.setItem("highContrast", "true");
-    } else {
-      document.body.classList.remove("high-contrast");
-      localStorage.setItem("highContrast", "false");
-    }
+      if (newPreferences.highContrast) {
+        document.body.classList.add("high-contrast");
+      } else {
+        document.body.classList.remove("high-contrast");
+      }
 
-    if (wheelchairToggle) {
-      localStorage.setItem("wheelchairRoute", wheelchairToggle.checked ? "true" : "false");
-    }
-
-    if (languageSelect) {
-      setLanguage(languageSelect.value);
+      localStorage.setItem("largeText", newPreferences.largeText ? "true" : "false");
+      localStorage.setItem("highContrast", newPreferences.highContrast ? "true" : "false");
+      localStorage.setItem("wheelchairRoute", newPreferences.wheelchairRoute ? "true" : "false");
+      setLanguage(newPreferences.language);
     }
 
     closeModal(accessibilityModal);
@@ -126,12 +157,24 @@ if (saveBtn) {
 /* RESET */
 if (resetBtn) {
   resetBtn.addEventListener("click", () => {
-    localStorage.setItem("largeText", "false");
-    localStorage.setItem("highContrast", "false");
-    localStorage.setItem("wheelchairRoute", "false");
+    const defaults = {
+      largeText: false,
+      highContrast: false,
+      wheelchairRoute: false,
+      language: "nl"
+    };
 
-    document.body.classList.remove("large-text");
-    document.body.classList.remove("high-contrast");
+    if (window.campusProfile && typeof window.campusProfile.updatePreferences === "function") {
+      window.campusProfile.updatePreferences(defaults);
+    } else {
+      localStorage.setItem("largeText", "false");
+      localStorage.setItem("highContrast", "false");
+      localStorage.setItem("wheelchairRoute", "false");
+      setLanguage("nl");
+
+      document.body.classList.remove("large-text");
+      document.body.classList.remove("high-contrast");
+    }
 
     if (largeTextToggle) {
       largeTextToggle.checked = false;
@@ -144,8 +187,6 @@ if (resetBtn) {
     if (wheelchairToggle) {
       wheelchairToggle.checked = false;
     }
-
-    setLanguage("nl");
   });
 }
 

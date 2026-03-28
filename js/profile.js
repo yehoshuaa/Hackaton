@@ -136,7 +136,7 @@ profileLanguageSelect.addEventListener("change", () => {
 if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
         sessionStorage.removeItem("loggedInUser");
-        window.location.href = "index.html";
+        window.location.href = "../index.html";
     });
 }
 
