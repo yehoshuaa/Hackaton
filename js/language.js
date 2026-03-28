@@ -6,6 +6,7 @@ const translations = {
     forgotPasswordLink: "Wachtwoord vergeten",
     rememberLabel: "Onthoud mij",
     loginButton: "Inloggen",
+    demoLoginHint: "Voor demo: Geen gegevens nodig, klik direct op Inloggen.",
 
     accessibilityTitle: "Toegankelijkheid",
     largeTextTitle: "Grote tekst",
@@ -123,6 +124,7 @@ const translations = {
     forgotPasswordLink: "Forgot password",
     rememberLabel: "Remember me",
     loginButton: "Log in",
+    demoLoginHint: "For demo: No data needed, click Log in directly.",
 
     accessibilityTitle: "Accessibility",
     largeTextTitle: "Large text",

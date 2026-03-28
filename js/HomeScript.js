@@ -4,21 +4,22 @@ const ROOSTER_API_URL = "https://ical.windesheim.nl/api/Rooster-v10?culture=en&k
 const ROOSTER_PROXY_URL = `https://cors.utilitytool.app/${ROOSTER_API_URL}`;
 const DAYS_TO_SHOW = 7;
 const initialTab = new URLSearchParams(window.location.search).get("tab");
-const DUTCH_DAY_NAMES = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
-const DUTCH_MONTH_NAMES = [
-    "januari",
-    "februari",
-    "maart",
-    "april",
-    "mei",
-    "juni",
-    "juli",
-    "augustus",
-    "september",
-    "oktober",
-    "november",
-    "december"
-];
+
+function getCurrentLanguage() {
+    if (window.getSavedLanguage) {
+        return window.getSavedLanguage();
+    }
+    return "nl";
+}
+
+function formatDayLabel(date) {
+    const language = getCurrentLanguage();
+    return date.toLocaleDateString(language, {
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+    });
+}
 
 const hamburgerBtn = document.getElementById("hamburgerBtn");
 const sideMenu = document.getElementById("sideMenu");
@@ -515,7 +516,12 @@ function getLocalDateKey(date) {
 }
 
 function formatDayLabel(date) {
-    return `${DUTCH_DAY_NAMES[date.getDay()]} ${date.getDate()} ${DUTCH_MONTH_NAMES[date.getMonth()]}`;
+    const lang = getCurrentLanguage();
+    return date.toLocaleDateString(lang, {
+        weekday: "long",
+        day: "numeric",
+        month: "long"
+    });
 }
 
 function formatTime(date) {

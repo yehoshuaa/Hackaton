@@ -215,7 +215,25 @@ if (forgotModal) {
 if (forgotForm) {
   forgotForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    closeModal(forgotModal);
+    const email = document.getElementById("forgotEmail").value.trim();
+    if (!email) {
+      alert("Voer een geldig e-mailadres in.");
+      return;
+    }
+
+    // Replace with your EmailJS service ID, template ID, and public key from https://www.emailjs.com/
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+      to_email: email,
+      reset_link: 'https://yehoshuaa.github.io/Hackaton/reset-password?token=demo' // Replace with actual reset URL
+    }, 'YOUR_PUBLIC_KEY')
+    .then(() => {
+      alert('Reset link verzonden naar je e-mail!');
+      closeModal(forgotModal);
+    })
+    .catch((error) => {
+      console.error('EmailJS error:', error);
+      alert('Er ging iets mis. Probeer later opnieuw.');
+    });
   });
 }
 
@@ -248,12 +266,16 @@ if (loginForm) {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if (email === "jeremy@windesheim.nl" && password === "Hallo123") {
+    // Demo mode: geen credentials verplicht, altijd inloggen als leeg
+    if ((email === "" && password === "") ||
+        (email === "jeremy@windesheim.nl" && password === "Hallo123") ||
+        (email === "s1183889@student.windesheim.nl" && password === "@Emily2009")) {
       sessionStorage.setItem("showStarterGuide", "true");
       window.location.href = "pages/HomePagina.html";
-    } else {
-      openModal(errorModal);
+      return;
     }
+
+    openModal(errorModal);
   });
 }
 
